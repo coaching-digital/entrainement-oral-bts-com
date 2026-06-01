@@ -915,7 +915,7 @@ export default function App() {
       }
       const date = new Date().toLocaleDateString("fr-FR").replace(/\//g, "-");
       const phaseName = phase.label.replace(/ /g, "_");
-      pdf.save(\`BTS_Com_Bilan_\${phaseName}_\${date}.pdf\`);
+      pdf.save("BTS_Com_Bilan_" + phaseName + "_" + date + ".pdf");
     } catch (e) {
       console.error("PDF error:", e);
       alert("Erreur lors de la génération du PDF. Essayez depuis un navigateur.");
