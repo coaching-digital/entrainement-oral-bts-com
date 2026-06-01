@@ -1112,43 +1112,26 @@ export default function App() {
         }
         /* ── DESKTOP (≥1024px) ── */
         @media (min-width: 1024px) {
-          .page-container { max-width: 100%; padding: 0; }
+          /* Scale uniquement sur home et feedback — pas sur session */
+          .page-container {
+            max-width: 100%;
+            padding: 0;
+            transform-origin: top center;
+            transform: scale(1.45);
+            width: calc(100% / 1.45);
+            margin-left: calc((100% - 100% / 1.45) / 2);
+          }
           .session-container { max-width: 100%; }
-
-          /* ── HOME uniquement ── */
-          .home-hero { padding: 4rem 8vw 3.5rem !important; }
-          .home-hero h1 { font-size: 52px !important; line-height: 1.1; }
-          .home-hero p { font-size: 20px !important; line-height: 1.6; }
-          .home-hero > div > div:last-child span { font-size: 15px !important; padding: 6px 18px !important; }
-          .home-tabs { padding: 10px 8vw !important; }
-          .tab-btn { font-size: 17px !important; padding: 14px 8px !important; }
-          .home-content { padding: 2.5rem 8vw 3rem !important; }
-
-          /* Texte des éléments home */
-          .home-content > div { font-size: 16px; }
-          .home-content button > div > div:first-child { font-size: 16px !important; }
-          .home-content button > div > div:last-child { font-size: 14px !important; }
-
-          /* Simulation complète */
-          .sim-btn { padding: 26px 28px !important; }
-          .sim-btn > span:first-child { font-size: 38px !important; }
-
           /* Grille 3 colonnes pour les 3 parties */
-          .phases-grid { display:grid !important; grid-template-columns:repeat(3,1fr); gap:20px; }
-          .phases-grid > button { flex-direction:column !important; align-items:flex-start !important; padding:28px !important; margin-bottom:0 !important; }
-          .phases-grid > button > span:first-child { font-size:36px !important; margin-bottom:14px; }
-          .phases-grid .phase-label { font-size:18px !important; }
-          .phases-grid .phase-sub { font-size:15px !important; margin-top: 4px !important; }
-          .phases-grid .phase-time { font-size:15px !important; align-self:flex-end; margin-top:16px; }
-
+          .phases-grid { display:grid !important; grid-template-columns:repeat(3,1fr); gap:16px; }
+          .phases-grid > button { flex-direction:column !important; align-items:flex-start !important; padding:20px !important; margin-bottom:0 !important; }
+          .phases-grid > button > span:first-child { font-size:28px !important; margin-bottom:10px; }
+          .phases-grid .phase-label { font-size:15px !important; }
+          .phases-grid .phase-sub { font-size:13px !important; }
+          .phases-grid .phase-time { font-size:13px !important; align-self:flex-end; margin-top:8px; }
           /* Grille 2 colonnes pour les critères */
-          .criteria-grid { display:grid !important; grid-template-columns:1fr 1fr; gap:12px; }
-          .criteria-grid > * { margin-bottom:0 !important; padding: 14px 16px !important; }
-          .criteria-grid > * span:last-child { font-size:14px !important; }
-
-          /* Feedback */
-          .feedback-hero { padding: 3rem 8vw !important; }
-          .feedback-content { padding: 0 8vw 2rem !important; }
+          .criteria-grid { display:grid !important; grid-template-columns:1fr 1fr; gap:10px; }
+          .criteria-grid > * { margin-bottom:0 !important; }
         }
 
         /* Utilitaires responsive */
