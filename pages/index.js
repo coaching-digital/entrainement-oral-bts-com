@@ -163,40 +163,94 @@ async function clearHistory() {
  
 // ─── TTS HOOK ─────────────────────────────────────────────────────────────────
  
+// Sélectionne la meilleure voix française disponible
+function getBestFrVoice(synth) {
+  const voices = synth.getVoices();
+  // Priorité : voix premium/enhanced, puis voix locale FR, puis toute voix fr
+  const priority = [
+    v => v.lang === "fr-FR" && (v.name.includes("Enhanced") || v.name.includes("Premium")),
+    v => v.lang === "fr-FR" && v.localService,
+    v => v.lang === "fr-FR",
+    v => v.lang.startsWith("fr") && v.localService,
+    v => v.lang.startsWith("fr"),
+  ];
+  for (const test of priority) {
+    const found = voices.find(test);
+    if (found) return found;
+  }
+  return null;
+}
+ 
+// Découpe un texte en phrases naturelles
+function splitSentences(text) {
+  return text
+    .replace(/\*[^*]+\*/g, "")
+    .replace(/\[[^\]]+\]/g, "")
+    .replace(/#{1,3} /g, "")
+    .trim()
+    .split(/(?<=[.!?:])\s+/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+}
+ 
 function useTTS(muted) {
   const synthRef = useRef(null);
+  const queueRef = useRef([]);
+  const playingRef = useRef(false);
   const [speaking, setSpeaking] = useState(false);
  
   useEffect(() => {
-    if (typeof window !== "undefined") synthRef.current = window.speechSynthesis;
+    if (typeof window === "undefined") return;
+    synthRef.current = window.speechSynthesis;
+    // Warm-up iOS : débloquer l'API audio au premier geste utilisateur
+    const warmup = () => {
+      if (!synthRef.current) return;
+      const utt = new SpeechSynthesisUtterance("");
+      utt.volume = 0;
+      synthRef.current.speak(utt);
+      document.removeEventListener("touchstart", warmup);
+      document.removeEventListener("click", warmup);
+    };
+    document.addEventListener("touchstart", warmup, { once: true });
+    document.addEventListener("click", warmup, { once: true });
     return () => synthRef.current?.cancel();
+  }, []);
+ 
+  // Joue la prochaine phrase de la queue
+  const playNext = useCallback(() => {
+    if (!synthRef.current || queueRef.current.length === 0) {
+      playingRef.current = false;
+      setSpeaking(false);
+      return;
+    }
+    const sentence = queueRef.current.shift();
+    const utt = new SpeechSynthesisUtterance(sentence);
+    utt.lang = "fr-FR";
+    utt.rate = 0.9;   // Un peu plus lent = plus naturel
+    utt.pitch = 0.95;
+    utt.volume = 1;
+    const voice = getBestFrVoice(synthRef.current);
+    if (voice) utt.voice = voice;
+    utt.onstart = () => { playingRef.current = true; setSpeaking(true); };
+    utt.onend = () => playNext();
+    utt.onerror = () => playNext();
+    synthRef.current.speak(utt);
   }, []);
  
   const speak = useCallback((text) => {
     if (!synthRef.current || muted) return;
     synthRef.current.cancel();
-    // Nettoyer le texte : supprimer astérisques et actions narratives
-    const clean = text
-      .replace(/\*[^*]+\*/g, "")
-      .replace(/\[[^\]]+\]/g, "")
-      .trim();
-    if (!clean) return;
-    const utt = new SpeechSynthesisUtterance(clean);
-    utt.lang = "fr-FR";
-    utt.rate = 0.95;
-    utt.pitch = 1;
-    // Préférer une voix française si disponible
-    const voices = synthRef.current.getVoices();
-    const frVoice = voices.find(v => v.lang.startsWith("fr"));
-    if (frVoice) utt.voice = frVoice;
-    utt.onstart = () => setSpeaking(true);
-    utt.onend = () => setSpeaking(false);
-    utt.onerror = () => setSpeaking(false);
-    synthRef.current.speak(utt);
-  }, [muted]);
+    queueRef.current = splitSentences(text);
+    playingRef.current = false;
+    setSpeaking(false);
+    // Petit délai pour laisser le cancel se propager (surtout iOS)
+    setTimeout(() => playNext(), 120);
+  }, [muted, playNext]);
  
   const stop = useCallback(() => {
     synthRef.current?.cancel();
+    queueRef.current = [];
+    playingRef.current = false;
     setSpeaking(false);
   }, []);
  
