@@ -1103,18 +1103,36 @@ export default function App() {
 
         /* ── DESKTOP (≥1024px) ── */
         @media (min-width: 1024px) {
-          .home-hero { padding:2.5rem 2rem 2rem; border-radius:0 0 32px 32px; }
-          .home-hero h1 { font-size:32px; }
-          .home-content { padding:1.5rem 2rem; }
-          .session-header { padding:1.25rem 1.5rem; }
-          .timer-display { font-size:34px; }
-          .msg-area { padding:1.25rem 1.5rem; }
-          .controls-area { padding:1rem 1.5rem 1.25rem; }
-          .feedback-hero { padding:2rem; }
-          .feedback-content { padding:0 1.5rem; }
-          .msg-jury, .msg-cand { font-size:15px; }
+          .page-container { max-width: 720px; }
+          .session-container { max-width: 860px; }
+          .home-hero { padding:3rem 3rem 2.5rem; border-radius:0 0 32px 32px; }
+          .home-hero h1 { font-size:36px; }
+          .home-tabs { padding:10px 12px; }
+          .home-content { padding:2rem 3rem; }
+          .session-header { padding:1.25rem 2rem; }
+          .timer-display { font-size:36px; }
+          .msg-area { padding:1.5rem 2rem; }
+          .controls-area { padding:1.25rem 2rem 1.5rem; }
+          .feedback-hero { padding:2.5rem 3rem; }
+          .feedback-content { padding:0 3rem; }
+          .msg-jury, .msg-cand { font-size:15px; max-width: 80%; }
           .mic-btn { width:80px; height:80px; }
           .mic-btn svg { width:30px; height:30px; }
+          /* Grille 3 colonnes pour les 3 parties */
+          .phases-grid { display:grid !important; grid-template-columns: repeat(3,1fr); gap:12px; }
+          .phases-grid > * { margin-bottom: 0 !important; }
+          /* Grille 2 colonnes pour les critères */
+          .criteria-grid { display:grid !important; grid-template-columns: 1fr 1fr; gap:8px; }
+          .criteria-grid > * { margin-bottom: 0 !important; }
+        }
+        /* ── TABLETTE large (≥768px) ── */
+        @media (min-width: 768px) {
+          .page-container { max-width: 640px; }
+          .home-hero { padding:2.5rem 2rem 2rem; }
+          .home-hero h1 { font-size:30px; }
+          .home-content { padding:1.5rem 2rem; }
+          .feedback-hero { padding:2rem; }
+          .feedback-content { padding:0 2rem; }
         }
 
         /* Utilitaires responsive */
@@ -1175,6 +1193,7 @@ export default function App() {
                 </button>
 
                 <div style={{ fontSize: 12, color: C.textSub, textAlign: "center", marginBottom: "1rem", fontWeight: 500 }}>— ou s'entraîner sur une partie —</div>
+                <div className="phases-grid" style={{ display:"flex", flexDirection:"column" }}>
                 {PHASES.map((p, i) => (
                   <button key={p.id} onClick={() => startPhase(i, "single")} style={{ width: "100%", padding: "14px 16px", borderRadius: 16, border: `1px solid ${C.border}`, background: C.bg, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
                     <span style={{ fontSize: 22, minWidth: 28, textAlign: "center" }}>{p.icon}</span>
@@ -1185,11 +1204,12 @@ export default function App() {
                     <span style={{ fontSize: 12, color: C.textSub, flexShrink: 0 }}>{p.id === "p0" ? "5 min" : p.id === "p1" ? "15 min" : "20 min"}</span>
                   </button>
                 ))}
+                </div>
 
                 <div style={{ fontSize: 12, color: C.textSub, textAlign: "center", margin: "1rem 0", fontWeight: 500 }}>— ou cibler un critère précis —</div>
                 <div style={{ background: C.bg2, borderRadius: 16, padding: "12px" }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 10 }}>📁 Partie 1 — Parcours</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: "1rem" }}>
+                  <div className="criteria-grid" style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: "1rem" }}>
                     {FICHES.p1.map((f) => (
                       <button key={f.id} onClick={() => startPhase(1, "ciblé", { part: "p1", label: f.label })} style={{ padding: "10px 12px", borderRadius: 12, border: `1px solid ${f.bg}`, background: f.bg, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 10 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: f.color, minWidth: 22, flexShrink: 0 }}>{f.id}</span>
@@ -1199,7 +1219,7 @@ export default function App() {
                     ))}
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 10 }}>🗂️ Partie 2 — Dossier</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <div className="criteria-grid" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {FICHES.p2.map((f) => (
                       <button key={f.id} onClick={() => startPhase(2, "ciblé", { part: "p2", label: f.label })} style={{ padding: "10px 12px", borderRadius: 12, border: `1px solid ${f.bg}`, background: f.bg, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 10 }}>
                         <span style={{ fontSize: 11, fontWeight: 700, color: f.color, minWidth: 22, flexShrink: 0 }}>{f.id}</span>
