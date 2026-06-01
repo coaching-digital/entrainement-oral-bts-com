@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
- 
+
 const C = {
   purple:"#7C3AED",purpleLight:"#EDE9FE",purpleDark:"#4C1D95",
   pink:"#DB2777",pinkLight:"#FCE7F3",
@@ -12,9 +12,9 @@ const C = {
   bg:"#ffffff",bg2:"#f9fafb",
   border:"#e5e7eb",
 };
- 
+
 function fmt(s){return`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;}
- 
+
 const FICHES = {
   p1: [
     { id:"C1", label:"Pertinence et diversité des productions", color:"#7C3AED", bg:"#EDE9FE",
@@ -81,24 +81,24 @@ const FICHES = {
     },
   ]
 };
- 
+
 // ─── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
- 
+
 const SYSTEM_P0 = `Tu es un jury de BTS Communication pour l'épreuve orale E6 Bloc 2.
 Le candidat vient de faire sa présentation personnelle de 5 minutes.
- 
+
 RÈGLES ABSOLUES :
 - Tu poses UNIQUEMENT des questions. Jamais de descriptions d'actions.
 - Pas de mise en scène. Des questions courtes et directes uniquement.
 - Pendant la session : questions uniquement. Feedback UNIQUEMENT sur "BILAN".
- 
+
 Sur "BILAN" — feedback structuré de la présentation personnelle :
 Évalue ces points : identité et personnalité, motivations pour le BTS Com, projet professionnel, évolution du projet, poste et missions en entreprise.
 Pour chaque point : niveau (Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant) + ce qui manquait concrètement.
 Évalue aussi l'expression orale : syntaxe, niveau de langue, clarté, hésitations.
 Donne 3-5 recommandations concrètes sur ce qu'il aurait fallu dire précisément.
 PAS de note chiffrée pour la présentation personnelle.`;
- 
+
 const makeSystemP1 = (ciblé=null, sévère=false, isSimulation=false) => `Tu es un jury de BTS Communication — Partie 1 : Parcours de professionnalisation (15 min).
 Grille officielle BTS Com E6 Bloc 2 — Partie 1 (note /10) :
 - C1 : Pertinence, efficacité et diversité des productions réalisées
@@ -106,19 +106,19 @@ Grille officielle BTS Com E6 Bloc 2 — Partie 1 (note /10) :
 - C3 : Capacité à justifier les choix créatifs effectués
 - C4 : Capacité à expliciter le parcours de professionnalisation
 - C5 : Regard réflexif sur les compétences acquises et capacité de transfert
- 
+
 RÈGLES ABSOLUES :
 - Tu poses UNIQUEMENT des questions. Une seule à la fois. Courte. Directe.
 - INTERDIT : *je note*, *je me penche*, *je souris*, ou toute action narrative.
 - INTERDIT : conseils ou encouragements pendant la session.
 - Demande systématiquement les annexes : "Avez-vous une annexe sur ce point ? Décrivez-la moi."
 - Feedback et conseils UNIQUEMENT sur "BILAN".
- 
+
 ${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 questions approfondies.` : `Explore les 5 critères C1 à C5.`}
 ${sévère ? `MODE SÉVÈRE : Relance sur chaque réponse vague. "Soyez plus précis.", "Donnez un exemple concret.", "Qu'est-ce qui vous permet de dire ça ?"` : ""}
- 
+
 Commence directement par ta première question, sans introduction.
- 
+
 Sur "BILAN" :
 ${isSimulation ? `MODE SIMULATION — Note officielle /10 :
 Utilise la grille officielle : Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant pour chaque critère C1 à C5.
@@ -138,22 +138,40 @@ EXPRESSION_ORALE: [niveau] | [commentaire]
 PALIER: [0-3 / 3-6 / 6-10] | [raison]
 POINTS_FORTS: [liste]
 POINTS_FAIBLES: [liste]
-RECOMMANDATIONS: [liste]` : `MODE ENTRAÎNEMENT — Pas de note chiffrée :
-Pour chaque critère C1 à C5 : niveau (Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant).
-Checklist de ce qui manquait concrètement pour chaque critère.
-Évalue l'expression orale séparément.
-3-5 recommandations prioritaires actionnables.
-Format STRICT :
+RECOMMANDATIONS: [liste]` : `MODE ENTRAÎNEMENT — Rôle pédagogique, pas de note chiffrée.
+Pour chaque critère évalué durant la session, rédige une fiche pédagogique complète.
+Format STRICT — utilise exactement ces balises :
+
 APPRECIATION_GLOBALE: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
-C1: [niveau] | [ce qui manquait]
-C2: [niveau] | [ce qui manquait]
-C3: [niveau] | [ce qui manquait]
-C4: [niveau] | [ce qui manquait]
-C5: [niveau] | [ce qui manquait]
-EXPRESSION_ORALE: [niveau] | [commentaire]
-CHECKLIST_MANQUANTS: [liste des éléments absents]
-RECOMMANDATIONS: [liste]`}`;
- 
+
+C1_NIVEAU: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
+C1_BIEN: [ce que le candidat a bien dit — cite ses propres mots si possible]
+C1_MANQUE: [ce qui manquait concrètement — sois précis et factuel]
+C1_EXEMPLE: [formule un exemple concret de ce qu'il aurait fallu dire]
+
+C2_NIVEAU: [niveau]
+C2_BIEN: [points positifs]
+C2_MANQUE: [manques concrets]
+C2_EXEMPLE: [exemple de bonne réponse]
+
+C3_NIVEAU: [niveau]
+C3_BIEN: [points positifs]
+C3_MANQUE: [manques concrets]
+C3_EXEMPLE: [exemple de bonne réponse]
+
+C4_NIVEAU: [niveau]
+C4_BIEN: [points positifs]
+C4_MANQUE: [manques concrets]
+C4_EXEMPLE: [exemple de bonne réponse]
+
+C5_NIVEAU: [niveau]
+C5_BIEN: [points positifs]
+C5_MANQUE: [manques concrets]
+C5_EXEMPLE: [exemple de bonne réponse]
+
+EXPRESSION_ORALE: [niveau] | [commentaire sur syntaxe, niveau de langue, clarté]
+RECOMMANDATIONS: [3-5 axes prioritaires d'amélioration séparés par des points-virgules]`}`;
+
 const makeSystemP2 = (ciblé=null, sévère=false, isSimulation=false) => `Tu es un jury de BTS Communication — Partie 2 : Dossier projets (20 min).
 Grille officielle BTS Com E6 Bloc 2 — Partie 2 (note /10) :
 - C1 : Mettre en œuvre une veille créative et technologique
@@ -161,19 +179,19 @@ Grille officielle BTS Com E6 Bloc 2 — Partie 2 (note /10) :
 - C3 : Produire et diffuser des solutions de communication
 - C4 : Acheter des prestations
 - C5 : Contrôler et évaluer les solutions de communication
- 
+
 RÈGLES ABSOLUES :
 - Tu poses UNIQUEMENT des questions. Une seule à la fois. Courte. Directe.
 - INTERDIT : *je note*, *je me penche*, ou toute action narrative.
 - INTERDIT : conseils ou encouragements pendant la session.
 - Demande systématiquement les annexes : "Avez-vous une annexe sur ce point ? Décrivez-la moi."
 - Feedback et conseils UNIQUEMENT sur "BILAN".
- 
+
 ${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 questions approfondies.` : `Explore les 5 compétences C1 à C5.`}
 ${sévère ? `MODE SÉVÈRE : Relance sur chaque réponse vague. Demande des preuves, des chiffres, des documents.` : ""}
- 
+
 Commence directement par ta première question, sans introduction.
- 
+
 Sur "BILAN" :
 ${isSimulation ? `MODE SIMULATION — Note officielle /10 :
 Utilise la grille officielle : Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant pour chaque critère C1 à C5.
@@ -193,30 +211,48 @@ EXPRESSION_ORALE: [niveau] | [commentaire]
 PALIER: [0-3 / 3-6 / 6-10] | [raison]
 POINTS_FORTS: [liste]
 POINTS_FAIBLES: [liste]
-RECOMMANDATIONS: [liste]` : `MODE ENTRAÎNEMENT — Pas de note chiffrée :
-Pour chaque critère C1 à C5 : niveau (Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant).
-Checklist de ce qui manquait concrètement pour chaque critère.
-Évalue l'expression orale séparément.
-3-5 recommandations prioritaires actionnables.
-Format STRICT :
+RECOMMANDATIONS: [liste]` : `MODE ENTRAÎNEMENT — Rôle pédagogique, pas de note chiffrée.
+Pour chaque critère évalué durant la session, rédige une fiche pédagogique complète.
+Format STRICT — utilise exactement ces balises :
+
 APPRECIATION_GLOBALE: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
-C1: [niveau] | [ce qui manquait]
-C2: [niveau] | [ce qui manquait]
-C3: [niveau] | [ce qui manquait]
-C4: [niveau] | [ce qui manquait]
-C5: [niveau] | [ce qui manquait]
-EXPRESSION_ORALE: [niveau] | [commentaire]
-CHECKLIST_MANQUANTS: [liste des éléments absents]
-RECOMMANDATIONS: [liste]`}`;
- 
+
+C1_NIVEAU: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
+C1_BIEN: [ce que le candidat a bien dit — cite ses propres mots si possible]
+C1_MANQUE: [ce qui manquait concrètement — sois précis et factuel]
+C1_EXEMPLE: [formule un exemple concret de ce qu'il aurait fallu dire]
+
+C2_NIVEAU: [niveau]
+C2_BIEN: [points positifs]
+C2_MANQUE: [manques concrets]
+C2_EXEMPLE: [exemple de bonne réponse]
+
+C3_NIVEAU: [niveau]
+C3_BIEN: [points positifs]
+C3_MANQUE: [manques concrets]
+C3_EXEMPLE: [exemple de bonne réponse]
+
+C4_NIVEAU: [niveau]
+C4_BIEN: [points positifs]
+C4_MANQUE: [manques concrets]
+C4_EXEMPLE: [exemple de bonne réponse]
+
+C5_NIVEAU: [niveau]
+C5_BIEN: [points positifs]
+C5_MANQUE: [manques concrets]
+C5_EXEMPLE: [exemple de bonne réponse]
+
+EXPRESSION_ORALE: [niveau] | [commentaire sur syntaxe, niveau de langue, clarté]
+RECOMMANDATIONS: [3-5 axes prioritaires d'amélioration séparés par des points-virgules]`}`;
+
 const PHASES = [
   { id:"p0", label:"Présentation personnelle", duration:5*60, icon:"🎤", intro:"Chrono lancé. Présente-toi pendant 5 minutes sans interruption, puis appuie sur Terminer." },
   { id:"p1", label:"Parcours de professionnalisation", duration:15*60, icon:"📁", intro:"Le jury va te poser des questions sur ton parcours. Choisis librement les projets qui illustrent tes réponses." },
   { id:"p2", label:"Dossier projets", duration:20*60, icon:"🗂️", intro:"Le jury va te questionner sur tes projets pro. Si tu mentionnes une annexe, sois prêt à la présenter oralement." },
 ];
- 
+
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
- 
+
 async function loadHistory() {
   try { const raw = localStorage.getItem("bts_sessions"); return raw ? JSON.parse(raw) : []; }
   catch { return []; }
@@ -228,9 +264,9 @@ async function saveSession(session) {
 async function clearHistory() {
   try { localStorage.removeItem("bts_sessions"); } catch {}
 }
- 
+
 // ─── TTS HOOK ─────────────────────────────────────────────────────────────────
- 
+
 // Sélectionne la meilleure voix française disponible
 function getBestFrVoice(synth) {
   const voices = synth.getVoices();
@@ -248,7 +284,7 @@ function getBestFrVoice(synth) {
   }
   return null;
 }
- 
+
 // Découpe un texte en phrases naturelles
 function splitSentences(text) {
   return text
@@ -260,13 +296,13 @@ function splitSentences(text) {
     .map(s => s.trim())
     .filter(s => s.length > 0);
 }
- 
+
 function useTTS(muted) {
   const synthRef = useRef(null);
   const queueRef = useRef([]);
   const playingRef = useRef(false);
   const [speaking, setSpeaking] = useState(false);
- 
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     synthRef.current = window.speechSynthesis;
@@ -283,7 +319,7 @@ function useTTS(muted) {
     document.addEventListener("click", warmup, { once: true });
     return () => synthRef.current?.cancel();
   }, []);
- 
+
   // Joue la prochaine phrase de la queue
   const playNext = useCallback(() => {
     if (!synthRef.current || queueRef.current.length === 0) {
@@ -304,7 +340,7 @@ function useTTS(muted) {
     utt.onerror = () => playNext();
     synthRef.current.speak(utt);
   }, []);
- 
+
   const speak = useCallback((text) => {
     if (!synthRef.current || muted) return;
     synthRef.current.cancel();
@@ -314,19 +350,19 @@ function useTTS(muted) {
     // Petit délai pour laisser le cancel se propager (surtout iOS)
     setTimeout(() => playNext(), 120);
   }, [muted, playNext]);
- 
+
   const stop = useCallback(() => {
     synthRef.current?.cancel();
     queueRef.current = [];
     playingRef.current = false;
     setSpeaking(false);
   }, []);
- 
+
   return { speak, stop, speaking };
 }
- 
+
 // ─── PARSING DU BILAN ─────────────────────────────────────────────────────────
- 
+
 const LEVELS_OFFICIAL = ["Très insuffisant", "Insuffisant", "Satisfaisant", "Très satisfaisant"];
 const LEVEL_COLORS = {
   "Très insuffisant": C.danger,
@@ -340,7 +376,7 @@ const LEVEL_BG = {
   "Satisfaisant": "#DBEAFE",
   "Très satisfaisant": C.successLight,
 };
- 
+
 const CRITERIA_LABELS_P1 = {
   C1: "Pertinence, efficacité et diversité des productions",
   C2: "Expliciter les productions, contextes et enjeux",
@@ -355,20 +391,20 @@ const CRITERIA_LABELS_P2 = {
   C4: "Acheter des prestations",
   C5: "Contrôler et évaluer les solutions",
 };
- 
+
 function getLevelColor(level) { return LEVEL_COLORS[level] || C.purple; }
 function getLevelBg(level) { return LEVEL_BG[level] || C.purpleLight; }
- 
+
 function parseBilan(text, phaseId, isSimulation) {
   if (!text) return null;
   const lines = text.split("\n");
- 
+
   // Extraire une valeur après un label "KEY: value"
   const extract = (key) => {
     const line = lines.find(l => l.trim().startsWith(key + ":"));
     return line ? line.replace(key + ":", "").trim() : null;
   };
- 
+
   // Extraire le niveau depuis une ligne "Cx: [niveau] | ..."
   const extractCriteria = (key) => {
     const line = lines.find(l => l.trim().startsWith(key + ":"));
@@ -379,7 +415,7 @@ function parseBilan(text, phaseId, isSimulation) {
     const comment = parts[1] ? parts[1].trim() : "";
     return { level, comment };
   };
- 
+
   // Extraire une liste après un label
   const extractList = (key) => {
     const line = lines.find(l => l.trim().startsWith(key + ":"));
@@ -387,9 +423,9 @@ function parseBilan(text, phaseId, isSimulation) {
     const val = line.replace(key + ":", "").trim();
     return val.split(/[;,•\-]/).map(s => s.trim()).filter(s => s.length > 3);
   };
- 
+
   const criteriaLabels = phaseId === "p1" ? CRITERIA_LABELS_P1 : CRITERIA_LABELS_P2;
- 
+
   if (isSimulation) {
     const noteKey = phaseId === "p1" ? "NOTE_P1" : "NOTE_P2";
     const noteStr = extract(noteKey);
@@ -414,25 +450,34 @@ function parseBilan(text, phaseId, isSimulation) {
   } else {
     const appreciation = extract("APPRECIATION_GLOBALE");
     const criteria = ["C1","C2","C3","C4","C5"].map(k => {
-      const c = extractCriteria(k);
+      const niveau = extract(k + "_NIVEAU");
+      const bien = extract(k + "_BIEN");
+      const manque = extract(k + "_MANQUE");
+      const exemple = extract(k + "_EXEMPLE");
+      // Fallback ancien format
+      const fallback = extractCriteria(k);
+      const level = niveau ? (LEVELS_OFFICIAL.find(l => niveau.includes(l)) || null) : fallback?.level || null;
       return {
         key: k,
         label: criteriaLabels[k] || k,
-        level: c?.level || null,
-        comment: c?.comment || "",
-        color: getLevelColor(c?.level),
-        bg: getLevelBg(c?.level),
+        level,
+        bien: bien || null,
+        manque: manque || fallback?.comment || null,
+        exemple: exemple || null,
+        color: getLevelColor(level),
+        bg: getLevelBg(level),
       };
-    });
+    }).filter(c => c.level || c.bien || c.manque); // N'affiche que les critères évalués
     const oral = extractCriteria("EXPRESSION_ORALE");
-    const checklist = extractList("CHECKLIST_MANQUANTS");
-    const reco = extractList("RECOMMANDATIONS");
-    return { type: "entrainement", appreciation, criteria, oral, checklist, recommandations: reco, raw: text };
+    const reco = extract("RECOMMANDATIONS")
+      ? extract("RECOMMANDATIONS").split(/[;]/).map(s => s.trim()).filter(s => s.length > 3)
+      : extractList("RECOMMANDATIONS");
+    return { type: "entrainement", appreciation, criteria, oral, recommandations: reco, raw: text };
   }
 }
- 
+
 // ─── COMPOSANTS ───────────────────────────────────────────────────────────────
- 
+
 const FicheDetail = ({ fiche, onClose }) => (
   <div style={{ background: C.bg, borderRadius: 20, border: `1.5px solid ${fiche.bg}`, padding: "1.5rem", marginBottom: "1rem" }}>
     <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: "1rem" }}>
@@ -460,9 +505,9 @@ const FicheDetail = ({ fiche, onClose }) => (
     <button onClick={onClose} style={{ width: "100%", marginTop: "1.25rem", padding: "12px", borderRadius: 14, border: "none", background: C.grad, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}>Fermer</button>
   </div>
 );
- 
+
 // ─── SCORE CARD ───────────────────────────────────────────────────────────────
- 
+
 const CritereCard = ({ label, level, comment, color, bg }) => (
   <div style={{ background: bg || C.purpleLight, borderRadius: 14, padding: "12px 14px", marginBottom: 8, border: `1.5px solid ${color || C.purple}` }}>
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: comment ? 6 : 0 }}>
@@ -474,7 +519,7 @@ const CritereCard = ({ label, level, comment, color, bg }) => (
     {comment && <div style={{ fontSize: 12, color: C.textSub, lineHeight: 1.5 }}>{comment}</div>}
   </div>
 );
- 
+
 const NoteBar = ({ note, max = 10, color }) => {
   const pct = (note / max) * 100;
   return (
@@ -483,7 +528,7 @@ const NoteBar = ({ note, max = 10, color }) => {
     </div>
   );
 };
- 
+
 const AppreciationBadge = ({ level }) => {
   const color = getLevelColor(level);
   const bg = getLevelBg(level);
@@ -495,9 +540,9 @@ const AppreciationBadge = ({ level }) => {
     </div>
   );
 };
- 
+
 // ─── APP ──────────────────────────────────────────────────────────────────────
- 
+
 export default function App() {
   const [screen, setScreen] = useState("home");
   const [tab, setTab] = useState("modes");
@@ -520,15 +565,15 @@ export default function App() {
   const [muted, setMuted] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [parsedBilan, setParsedBilan] = useState(null);
- 
+
   const recognitionRef = useRef(null);
   const monoRef = useRef(""); // Accumule le monologue P0 hors state React
   const intervalRef = useRef(null);
   const bottomRef = useRef(null);
   const phase = PHASES[phaseIdx];
- 
+
   const { speak, stop: stopTTS, speaking } = useTTS(muted);
- 
+
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { setSpeechSupported(false); setShowTextInput(true); }
@@ -539,24 +584,24 @@ export default function App() {
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
   }, []);
- 
+
   useEffect(() => {
     if (running && timer > 0) { intervalRef.current = setInterval(() => setTimer(t => t - 1), 1000); }
     else clearInterval(intervalRef.current);
     return () => clearInterval(intervalRef.current);
   }, [running, timer]);
- 
+
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
- 
+
   const refreshHistory = async () => { const h = await loadHistory(); setHistory(h); };
- 
+
   const getSystem = (p, c = null, isSim = false) => {
     const sev = juryMode === "sévère";
     if (p.id === "p0") return SYSTEM_P0;
     if (p.id === "p1") return makeSystemP1(c?.label || null, sev, isSim);
     return makeSystemP2(c?.label || null, sev, isSim);
   };
- 
+
   const callAI = async (msgs, system) => {
     setLoading(true);
     try {
@@ -569,7 +614,7 @@ export default function App() {
     } catch { return "Une erreur s'est produite."; }
     finally { setLoading(false); }
   };
- 
+
   const startPhase = async (pIdx, modeType, cib = null) => {
     const p = PHASES[pIdx];
     setPhaseIdx(pIdx); setMode(modeType); setCiblé(cib);
@@ -583,9 +628,9 @@ export default function App() {
       setRunning(true);
     } else setRunning(true);
   };
- 
+
   const startFull = () => startPhase(0, "full");
- 
+
   const startRecording = () => {
     stopTTS();
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -608,7 +653,7 @@ export default function App() {
     rec.onend = () => setRecording(false);
     recognitionRef.current = rec; rec.start(); setRecording(true); setTranscript(""); final = "";
   };
- 
+
   const stopAndSend = async () => {
     recognitionRef.current?.stop(); setRecording(false);
     if (phase.id === "p0") {
@@ -619,7 +664,7 @@ export default function App() {
     if (!transcript.trim()) return;
     await sendMessage(transcript.trim()); setTranscript("");
   };
- 
+
   const sendMessage = async (text) => {
     const newMsgs = [...messages, { role: "user", content: text }];
     setMessages(newMsgs);
@@ -628,13 +673,13 @@ export default function App() {
     setMessages([...newMsgs, { role: "assistant", content: reply }]);
     speak(reply);
   };
- 
+
   const sendText = async () => {
     if (!textInput.trim()) return;
     const t = textInput.trim(); setTextInput("");
     await sendMessage(t);
   };
- 
+
   const endPhase = async () => {
     setRunning(false); stopTTS();
     recognitionRef.current?.stop(); setRecording(false);
@@ -663,7 +708,7 @@ export default function App() {
     await refreshHistory();
     setScreen("feedback");
   };
- 
+
   const confirmExit = () => {
     stopTTS();
     recognitionRef.current?.stop();
@@ -671,27 +716,27 @@ export default function App() {
     setShowExitConfirm(false);
     reset();
   };
- 
+
   const goNextPhase = () => {
     const next = phaseIdx + 1;
     if (next < PHASES.length) startPhase(next, "full");
     else reset();
   };
- 
+
   const reset = () => {
     stopTTS();
     setScreen("home"); setMessages([]); setTranscript(""); setRunning(false);
     setTimer(0); setLoading(false); setShowTextInput(false); setTextInput("");
     setCiblé(null); setTab("modes"); setParsedBilan(null); setShowExitConfirm(false);
   };
- 
+
   const timerWarn = timer < 120;
   const timerColor = timerWarn ? "#FFD6D6" : timer < (phase?.duration / 4) ? "#FFEAB6" : "#fff";
- 
+
   const openFiche = ficheOpen ? (ficheOpen.part === "p1" ? FICHES.p1[ficheOpen.idx] : FICHES.p2[ficheOpen.idx]) : null;
- 
+
   // ─── RENDER ─────────────────────────────────────────────────────────────────
- 
+
   return (
     <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: C.text, minHeight: "100vh", background: C.bg }}>
       <style>{`
@@ -715,7 +760,7 @@ export default function App() {
           .home-hero h1 { font-size:24px !important; }
         }
       `}</style>
- 
+
       {/* ── HOME ─────────────────────────────────────────────────────────────── */}
       {screen === "home" && (
         <div style={{ maxWidth: 480, margin: "0 auto", paddingBottom: "2rem" }}>
@@ -733,13 +778,13 @@ export default function App() {
               </div>
             </div>
           </div>
- 
+
           <div style={{ display: "flex", background: C.bg2, padding: "8px", gap: 4 }}>
             {[["modes", "🎯 S'entraîner"], ["conseils", "📚 Conseils"], ["historique", "🕐 Historique"]].map(([t, label]) => (
               <button key={t} className="tab-btn" onClick={() => setTab(t)} style={{ background: tab === t ? C.bg : "transparent", color: tab === t ? C.purple : C.textSub, fontWeight: tab === t ? 600 : 400 }}>{label}</button>
             ))}
           </div>
- 
+
           <div style={{ padding: "1.25rem" }}>
             {tab === "modes" && (
               <>
@@ -754,7 +799,7 @@ export default function App() {
                     </button>
                   </div>
                 </div>
- 
+
                 <button onClick={startFull} style={{ width: "100%", padding: "16px", borderRadius: 18, border: `2px solid ${C.purple}`, background: C.purpleLight, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 14, marginBottom: "1.25rem" }}>
                   <span style={{ fontSize: 28 }}>🚀</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -766,7 +811,7 @@ export default function App() {
                   </div>
                   <span style={{ fontSize: 13, fontWeight: 600, color: C.purple, flexShrink: 0 }}>40 min</span>
                 </button>
- 
+
                 <div style={{ fontSize: 12, color: C.textSub, textAlign: "center", marginBottom: "1rem", fontWeight: 500 }}>— ou s'entraîner sur une partie —</div>
                 {PHASES.map((p, i) => (
                   <button key={p.id} onClick={() => startPhase(i, "single")} style={{ width: "100%", padding: "14px 16px", borderRadius: 16, border: `1px solid ${C.border}`, background: C.bg, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
@@ -778,7 +823,7 @@ export default function App() {
                     <span style={{ fontSize: 12, color: C.textSub, flexShrink: 0 }}>{p.id === "p0" ? "5 min" : p.id === "p1" ? "15 min" : "20 min"}</span>
                   </button>
                 ))}
- 
+
                 <div style={{ fontSize: 12, color: C.textSub, textAlign: "center", margin: "1rem 0", fontWeight: 500 }}>— ou cibler un critère précis —</div>
                 <div style={{ background: C.bg2, borderRadius: 16, padding: "12px" }}>
                   <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 10 }}>📁 Partie 1 — Parcours</div>
@@ -804,7 +849,7 @@ export default function App() {
                 </div>
               </>
             )}
- 
+
             {tab === "conseils" && (
               <>
                 {openFiche ? (
@@ -842,7 +887,7 @@ export default function App() {
                 )}
               </>
             )}
- 
+
             {tab === "historique" && (
               <>
                 {histLoading ? (
@@ -880,11 +925,11 @@ export default function App() {
           </div>
         </div>
       )}
- 
+
       {/* ── SESSION ──────────────────────────────────────────────────────────── */}
       {screen === "session" && (
         <div style={{ maxWidth: 560, margin: "0 auto", display: "flex", flexDirection: "column", height: "100dvh" }}>
- 
+
           {/* Modale de confirmation de sortie */}
           {showExitConfirm && (
             <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 100, padding: "0 1.5rem" }}>
@@ -897,7 +942,7 @@ export default function App() {
               </div>
             </div>
           )}
- 
+
           {/* Header */}
           <div className="session-header" style={{ background: C.grad, padding: "1rem 1.25rem", borderRadius: "0 0 20px 20px", flexShrink: 0 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
@@ -939,7 +984,7 @@ export default function App() {
               <div style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.8)", width: `${(1 - timer / phase.duration) * 100}%`, transition: "width 1s linear" }} />
             </div>
           </div>
- 
+
           {/* Messages */}
           <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem", WebkitOverflowScrolling: "touch" }}>
             <div style={{ background: C.purpleLight, borderRadius: 12, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: C.purpleDark, lineHeight: 1.6 }}>{phase.intro}</div>
@@ -957,7 +1002,7 @@ export default function App() {
             )}
             <div ref={bottomRef} />
           </div>
- 
+
           {/* Contrôles */}
           <div style={{ padding: "0.875rem 1.25rem 1rem", borderTop: `1px solid ${C.border}`, background: C.bg, flexShrink: 0 }}>
             {!showTextInput ? (
@@ -1018,7 +1063,7 @@ export default function App() {
           </div>
         </div>
       )}
- 
+
       {/* ── FEEDBACK ─────────────────────────────────────────────────────────── */}
       {screen === "feedback" && (() => {
         const pb = parsedBilan;
@@ -1046,9 +1091,9 @@ export default function App() {
               <AppreciationBadge level={pb.appreciation} />
             ) : null}
           </div>
- 
+
           <div style={{ padding: "0 1.25rem" }}>
- 
+
             {/* ─ SIMULATION : grille officielle ─ */}
             {isSimFeedback && pb?.criteria && (
               <div style={{ marginBottom: "1.5rem" }}>
@@ -1074,33 +1119,60 @@ export default function App() {
                 )}
               </div>
             )}
- 
-            {/* ─ ENTRAÎNEMENT : appréciation + checklist ─ */}
-            {!isSimFeedback && pb?.criteria && (
+
+            {/* ─ ENTRAÎNEMENT : fiches pédagogiques par critère ─ */}
+            {!isSimFeedback && pb?.criteria?.length > 0 && (
               <div style={{ marginBottom: "1.5rem" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Évaluation par critère</div>
-                {pb.criteria.map((c, i) => <CritereCard key={i} {...c} />)}
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Analyse par critère</div>
+                {pb.criteria.map((c, i) => (
+                  <div key={i} style={{ background: C.bg, borderRadius: 16, border: `1.5px solid ${c.color}`, marginBottom: 14, overflow: "hidden" }}>
+                    {/* En-tête critère */}
+                    <div style={{ background: c.bg, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ background: c.color, color: "#fff", borderRadius: "50%", width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{c.key}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.text, flex: 1 }}>{c.label}</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: c.color, background: "#fff", borderRadius: 20, padding: "3px 10px", border: `1px solid ${c.color}`, flexShrink: 0, whiteSpace: "nowrap" }}>{c.level || "—"}</span>
+                    </div>
+                    <div style={{ padding: "12px 14px" }}>
+                      {/* Points positifs */}
+                      {c.bien && c.bien !== "Aucun point positif identifié" && c.bien.length > 5 && (
+                        <div style={{ marginBottom: 10 }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: C.success, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 5 }}>✓ Ce qui était bien</div>
+                          <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, background: C.successLight, borderRadius: 10, padding: "8px 12px" }}>{c.bien}</div>
+                        </div>
+                      )}
+                      {/* Ce qui manquait */}
+                      {c.manque && c.manque.length > 5 && (
+                        <div style={{ marginBottom: 10 }}>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: C.danger, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 5 }}>✕ Ce qui manquait</div>
+                          <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, background: C.dangerLight, borderRadius: 10, padding: "8px 12px" }}>{c.manque}</div>
+                        </div>
+                      )}
+                      {/* Exemple de bonne réponse */}
+                      {c.exemple && c.exemple.length > 5 && (
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: C.purple, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 5 }}>💡 Ce qu'il fallait dire</div>
+                          <div style={{ fontSize: 13, fontStyle: "italic", color: C.purpleDark, lineHeight: 1.6, background: C.purpleLight, borderRadius: 10, padding: "8px 12px" }}>"{c.exemple}"</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {/* Expression orale */}
                 {pb.oral && (
-                  <CritereCard label="Expression orale" level={pb.oral.level} comment={pb.oral.comment} color={getLevelColor(pb.oral.level)} bg={getLevelBg(pb.oral.level)} />
+                  <div style={{ background: C.bg, borderRadius: 16, border: `1.5px solid ${getLevelColor(pb.oral.level)}`, overflow: "hidden" }}>
+                    <div style={{ background: getLevelBg(pb.oral.level), padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 16 }}>🗣️</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.text, flex: 1 }}>Expression orale</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: getLevelColor(pb.oral.level), background: "#fff", borderRadius: 20, padding: "3px 10px", border: `1px solid ${getLevelColor(pb.oral.level)}`, flexShrink: 0 }}>{pb.oral.level || "—"}</span>
+                    </div>
+                    {pb.oral.comment && (
+                      <div style={{ padding: "12px 14px", fontSize: 13, color: C.text, lineHeight: 1.6 }}>{pb.oral.comment}</div>
+                    )}
+                  </div>
                 )}
               </div>
             )}
- 
-            {/* Checklist manquants (entraînement) */}
-            {!isSimFeedback && pb?.checklist?.length > 0 && (
-              <div style={{ marginBottom: "1.5rem" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Ce qui manquait</div>
-                <div style={{ background: C.dangerLight, borderRadius: 14, padding: "12px 14px" }}>
-                  {pb.checklist.map((item, i) => (
-                    <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
-                      <span style={{ color: C.danger, fontWeight: 700, flexShrink: 0 }}>✕</span>
-                      <span style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
- 
+
             {/* Points forts (simulation) */}
             {isSimFeedback && pb?.pointsForts?.length > 0 && (
               <div style={{ marginBottom: "1rem" }}>
@@ -1115,7 +1187,7 @@ export default function App() {
                 </div>
               </div>
             )}
- 
+
             {/* Points faibles (simulation) */}
             {isSimFeedback && pb?.pointsFaibles?.length > 0 && (
               <div style={{ marginBottom: "1.5rem" }}>
@@ -1130,7 +1202,7 @@ export default function App() {
                 </div>
               </div>
             )}
- 
+
             {/* Recommandations */}
             {pb?.recommandations?.length > 0 && (
               <div style={{ marginBottom: "1.5rem" }}>
@@ -1145,7 +1217,7 @@ export default function App() {
                 </div>
               </div>
             )}
- 
+
             {/* Feedback brut si parsing insuffisant */}
             {(!pb || (!pb.criteria?.length && !pb.appreciation)) && (
               <>
@@ -1155,7 +1227,7 @@ export default function App() {
                 </div>
               </>
             )}
- 
+
             {/* Échanges */}
             <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Échanges de la session</div>
             <div style={{ background: C.bg2, borderRadius: 16, padding: "12px 16px", marginBottom: "1.5rem", maxHeight: 260, overflowY: "auto" }}>
@@ -1166,7 +1238,7 @@ export default function App() {
                 </div>
               ))}
             </div>
- 
+
             {/* Actions */}
             {mode === "full" && phaseIdx < PHASES.length - 1 && (
               <button onClick={goNextPhase} className="btn-primary" style={{ width: "100%", padding: "16px", fontSize: 16, marginBottom: 10 }}>
