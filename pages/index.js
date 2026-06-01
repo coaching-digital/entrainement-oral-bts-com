@@ -402,24 +402,27 @@ function parseBilan(text, phaseId, isSimulation) {
   // Nettoie le markdown : **gras**, *italique*, ## titres
   const cleanMd = (s) => s ? s.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\*([^*]+)\*/g, "$1").replace(/^#+\s*/, "").trim() : null;
 
-  // Extraire une valeur après un label "KEY:" — supporte "## KEY:", "KEY:", sur une ligne ou multilignes
+  // Extraire une valeur après un label "KEY:" — supporte "## KEY:", "**KEY:**", multilignes
   const extract = (key) => {
-    // Cherche la ligne contenant la clé (avec ou sans ##)
     const idx = lines.findIndex(l => {
-      const clean = l.replace(/^#+\s*/, "").trim();
+      // Nettoie ##, ** avant de comparer
+      const clean = l.replace(/^#+\s*/, "").replace(/\*\*/g, "").trim();
       return clean.startsWith(key + ":") || clean === key + ":";
     });
     if (idx === -1) return null;
     const line = lines[idx];
-    const afterColon = line.substring(line.indexOf(key + ":") + key.length + 1).trim();
-    // Si la valeur est sur la même ligne
+    // Nettoie la ligne entière puis extrait après la clé
+    const cleanedLine = line.replace(/\*\*/g, "").replace(/^#+\s*/, "");
+    const colonPos = cleanedLine.indexOf(key + ":");
+    const afterColon = colonPos >= 0 ? cleanedLine.substring(colonPos + key.length + 1).trim() : "";
     if (afterColon && afterColon.length > 0) return cleanMd(afterColon);
-    // Sinon cherche les lignes suivantes jusqu'à la prochaine clé
+    // Multilignes : concatène jusqu'à la prochaine balise connue
     let val = "";
     for (let i = idx + 1; i < lines.length; i++) {
-      const next = lines[i].replace(/^#+\s*/, "").trim();
+      const next = lines[i].replace(/^#+\s*/, "").replace(/\*\*/g, "").trim();
       if (next.match(/^C[1-5]_|^APPRECIATION|^EXPRESSION|^RECOMMANDATIONS|^NOTE_|^PALIER|^POINTS/)) break;
-      if (next.length > 0) val += (val ? " " : "") + next;
+      if (next === "---" || next === "***") break;
+      if (next.length > 0) val += (val ? "\n" : "") + next;
     }
     return cleanMd(val) || null;
   };
@@ -427,11 +430,13 @@ function parseBilan(text, phaseId, isSimulation) {
   // Extraire le niveau depuis une ligne "Cx: [niveau] | ..."
   const extractCriteria = (key) => {
     const line = lines.find(l => {
-      const clean = l.replace(/^#+\s*/, "").trim();
+      const clean = l.replace(/^#+\s*/, "").replace(/\*\*/g, "").trim();
       return clean.startsWith(key + ":") && !clean.startsWith(key + "_");
     });
     if (!line) return null;
-    const val = cleanMd(line.substring(line.indexOf(key + ":") + key.length + 1).trim());
+    const cleanedLine = line.replace(/\*\*/g, "").replace(/^#+\s*/, "");
+    const colonPos = cleanedLine.indexOf(key + ":");
+    const val = colonPos >= 0 ? cleanMd(cleanedLine.substring(colonPos + key.length + 1).trim()) : "";
     const parts = val ? val.split("|") : [];
     const level = LEVELS_OFFICIAL.find(l => (parts[0] || "").includes(l)) || null;
     const comment = parts[1] ? parts[1].trim() : "";
