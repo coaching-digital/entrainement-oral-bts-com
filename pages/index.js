@@ -875,22 +875,29 @@ export default function App() {
     setRunning(false); stopTTS();
     recognitionRef.current?.stop(); setRecording(false);
     let feedbackMsgs;
+    let transitionMsg = null;
     if (phase.id === "p0") {
-      // Étape 1 : le jury dit la phrase de transition
-      const transition = "Merci pour cette présentation. Nous pouvons à présent passer à la suite de votre épreuve.";
-      setMessages([{ role: "assistant", content: transition }]);
-      speak(transition);
-      // Étape 2 : prépare le feedback (sera affiché sur l'écran feedback)
       const mono = monoRef.current.trim();
-      if (!mono) { setScreen("feedback"); return; }
-      feedbackMsgs = [{ role: "user", content: `Voici la présentation personnelle que le candidat vient de faire à l'oral : "${mono}". Donne-lui un feedback structuré et bienveillant sur : 1) les points forts, 2) ce qui manquait ou était trop vague (avec ce qu'il aurait fallu dire précisément), 3) des conseils sur l'expression orale (syntaxe, formulations, niveau de langue). Attribue une note /20 avec un niveau (Insuffisant/Fragile/Satisfaisant/Excellent). Sois exigeant : une présentation vague ou incomplète mérite une note basse.` }];
+      // Phrase de transition
+      transitionMsg = "Merci pour cette présentation. Nous pouvons à présent passer à la suite de votre épreuve.";
+      speak(transitionMsg);
+      if (!mono) {
+        setMessages([{ role: "assistant", content: transitionMsg }]);
+        setScreen("feedback");
+        return;
+      }
+      // Demander le feedback structuré via SYSTEM_P0
+      feedbackMsgs = [{ role: "user", content: "Voici la présentation personnelle du candidat : \"" + mono + "\". BILAN" }];
     } else {
       feedbackMsgs = [...messages, { role: "user", content: "BILAN" }];
     }
     const isSimulation = mode === "full";
     const sys = getSystem(phase, ciblé, isSimulation);
     const bilan = await callAI(feedbackMsgs, sys);
-    const allMsgs = [...messages, { role: "assistant", content: bilan }];
+    // Pour P0 : on garde la phrase de transition + le bilan
+    const allMsgs = phase.id === "p0"
+      ? [{ role: "assistant", content: transitionMsg }, { role: "assistant", content: bilan }]
+      : [...messages, { role: "assistant", content: bilan }];
     setMessages(allMsgs);
     const parsed = parseBilan(bilan, phase.id, isSimulation);
     setParsedBilan(parsed);
