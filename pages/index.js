@@ -937,30 +937,29 @@ export default function App() {
     const pb = parsedBilan;
     const date = new Date().toLocaleDateString("fr-FR");
     const phaseName = phase.label;
-    let body = \`Bilan d'entraînement BTS Communication — E6 Bloc 2\n\`;
-    body += \`\${phaseName} · \${date}\n\`;
-    body += \`\n\`;
-    if (pb?.appreciation) body += \`Appréciation globale : \${pb.appreciation}\n\n\`;
-    if (pb?.note != null) body += \`Note : \${pb.note}/10\n\n\`;
+    let body = "Bilan d'entraînement BTS Communication — E6 Bloc 2\n";
+    body += phaseName + " · " + date + "\n\n";
+    if (pb?.appreciation) body += "Appréciation globale : " + pb.appreciation + "\n\n";
+    if (pb?.note != null) body += "Note : " + pb.note + "/10\n\n";
     if (pb?.criteria?.length) {
       pb.criteria.forEach(c => {
-        body += \`--- \${c.key} : \${c.label} ---\n\`;
-        body += \`Niveau : \${c.level || "—"}\n\`;
-        if (c.bien) body += \`Points positifs : \${c.bien}\n\`;
-        if (c.manque) body += \`À améliorer : \${c.manque}\n\`;
-        if (c.exemple) body += \`Exemple : \${c.exemple}\n\`;
-        body += \`\n\`;
+        body += "--- " + c.key + " : " + c.label + " ---\n";
+        body += "Niveau : " + (c.level || "—") + "\n";
+        if (c.bien) body += "Points positifs : " + c.bien + "\n";
+        if (c.manque) body += "À améliorer : " + c.manque + "\n";
+        if (c.exemple) body += "Exemple : " + c.exemple + "\n";
+        body += "\n";
       });
     }
     if (pb?.recommandations?.length) {
-      body += \`Recommandations :\n\`;
-      pb.recommandations.forEach((r, i) => { body += \`\${i+1}. \${r}\n\`; });
+      body += "Recommandations :\n";
+      pb.recommandations.forEach((r, i) => { body += (i+1) + ". " + r + "\n"; });
     }
-    body += \`\nGénéré par entrainement-oral-bts-com.vercel.app\`;
-    const subject = encodeURIComponent(\`Bilan BTS Com — \${phaseName} — \${date}\`);
+    body += "\nGénéré par entrainement-oral-bts-com.vercel.app";
+    const subject = encodeURIComponent("Bilan BTS Com — " + phaseName + " — " + date);
     const bodyEncoded = encodeURIComponent(body);
     const email = emailInput.trim();
-    window.location.href = \`mailto:\${email}?subject=\${subject}&body=\${bodyEncoded}\`;
+    window.location.href = "mailto:" + email + "?subject=" + subject + "&body=" + bodyEncoded;
     setEmailSent(true);
     setShowEmailInput(false);
   };
