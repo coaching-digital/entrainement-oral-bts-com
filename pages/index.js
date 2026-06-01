@@ -399,29 +399,50 @@ function parseBilan(text, phaseId, isSimulation) {
   if (!text) return null;
   const lines = text.split("\n");
 
-  // Extraire une valeur après un label "KEY: value"
+  // Nettoie le markdown : **gras**, *italique*, ## titres
+  const cleanMd = (s) => s ? s.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\*([^*]+)\*/g, "$1").replace(/^#+\s*/, "").trim() : null;
+
+  // Extraire une valeur après un label "KEY:" — supporte "## KEY:", "KEY:", sur une ligne ou multilignes
   const extract = (key) => {
-    const line = lines.find(l => l.trim().startsWith(key + ":"));
-    return line ? line.replace(key + ":", "").trim() : null;
+    // Cherche la ligne contenant la clé (avec ou sans ##)
+    const idx = lines.findIndex(l => {
+      const clean = l.replace(/^#+\s*/, "").trim();
+      return clean.startsWith(key + ":") || clean === key + ":";
+    });
+    if (idx === -1) return null;
+    const line = lines[idx];
+    const afterColon = line.substring(line.indexOf(key + ":") + key.length + 1).trim();
+    // Si la valeur est sur la même ligne
+    if (afterColon && afterColon.length > 0) return cleanMd(afterColon);
+    // Sinon cherche les lignes suivantes jusqu'à la prochaine clé
+    let val = "";
+    for (let i = idx + 1; i < lines.length; i++) {
+      const next = lines[i].replace(/^#+\s*/, "").trim();
+      if (next.match(/^C[1-5]_|^APPRECIATION|^EXPRESSION|^RECOMMANDATIONS|^NOTE_|^PALIER|^POINTS/)) break;
+      if (next.length > 0) val += (val ? " " : "") + next;
+    }
+    return cleanMd(val) || null;
   };
 
   // Extraire le niveau depuis une ligne "Cx: [niveau] | ..."
   const extractCriteria = (key) => {
-    const line = lines.find(l => l.trim().startsWith(key + ":"));
+    const line = lines.find(l => {
+      const clean = l.replace(/^#+\s*/, "").trim();
+      return clean.startsWith(key + ":") && !clean.startsWith(key + "_");
+    });
     if (!line) return null;
-    const val = line.replace(key + ":", "").trim();
-    const parts = val.split("|");
-    const level = LEVELS_OFFICIAL.find(l => parts[0].includes(l)) || null;
+    const val = cleanMd(line.substring(line.indexOf(key + ":") + key.length + 1).trim());
+    const parts = val ? val.split("|") : [];
+    const level = LEVELS_OFFICIAL.find(l => (parts[0] || "").includes(l)) || null;
     const comment = parts[1] ? parts[1].trim() : "";
     return { level, comment };
   };
 
   // Extraire une liste après un label
   const extractList = (key) => {
-    const line = lines.find(l => l.trim().startsWith(key + ":"));
-    if (!line) return [];
-    const val = line.replace(key + ":", "").trim();
-    return val.split(/[;,•\-]/).map(s => s.trim()).filter(s => s.length > 3);
+    const val = extract(key);
+    if (!val) return [];
+    return val.split(/[;,•]/).map(s => s.replace(/^[-–]\s*/, "").trim()).filter(s => s.length > 3);
   };
 
   const criteriaLabels = phaseId === "p1" ? CRITERIA_LABELS_P1 : CRITERIA_LABELS_P2;
