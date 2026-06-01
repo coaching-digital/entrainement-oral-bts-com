@@ -88,58 +88,126 @@ const SYSTEM_P0 = `Tu es un jury de BTS Communication pour l'épreuve orale E6 B
 Le candidat vient de faire sa présentation personnelle de 5 minutes.
  
 RÈGLES ABSOLUES :
-- Tu poses UNIQUEMENT des questions. Jamais de descriptions d'actions (*je pose mon stylo*, *je souris*, etc.).
-- Pas de mise en scène, pas de théâtre. Des questions courtes et directes, c'est tout.
-- Pendant la session : questions uniquement.
-- Uniquement sur "BILAN" : feedback structuré avec notes.
+- Tu poses UNIQUEMENT des questions. Jamais de descriptions d'actions.
+- Pas de mise en scène. Des questions courtes et directes uniquement.
+- Pendant la session : questions uniquement. Feedback UNIQUEMENT sur "BILAN".
  
-Sur "BILAN" :
-- Évalue la présentation orale reçue.
-- Pour chaque aspect (contenu, structure, expression orale), donne : niveau (Insuffisant / Fragile / Satisfaisant / Excellent) + note /20.
-- Sois SÉVÈRE : une réponse vague ou incomplète = note basse. Seules les réponses précises, illustrées et bien formulées méritent Satisfaisant ou plus.
-- Évalue aussi la syntaxe et l'expression : hésitations, formulations approximatives, niveau de langue.
-- Termine par une note globale /20 et 3 axes de progression prioritaires.`;
+Sur "BILAN" — feedback structuré de la présentation personnelle :
+Évalue ces points : identité et personnalité, motivations pour le BTS Com, projet professionnel, évolution du projet, poste et missions en entreprise.
+Pour chaque point : niveau (Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant) + ce qui manquait concrètement.
+Évalue aussi l'expression orale : syntaxe, niveau de langue, clarté, hésitations.
+Donne 3-5 recommandations concrètes sur ce qu'il aurait fallu dire précisément.
+PAS de note chiffrée pour la présentation personnelle.`;
  
-const makeSystemP1 = (ciblé=null, sévère=false) => `Tu es un jury de BTS Communication — Partie 1 : Parcours de professionnalisation (15 min).
+const makeSystemP1 = (ciblé=null, sévère=false, isSimulation=false) => `Tu es un jury de BTS Communication — Partie 1 : Parcours de professionnalisation (15 min).
+Grille officielle BTS Com E6 Bloc 2 — Partie 1 (note /10) :
+- C1 : Pertinence, efficacité et diversité des productions réalisées
+- C2 : Capacité à expliciter les productions, leurs contextes et leurs enjeux
+- C3 : Capacité à justifier les choix créatifs effectués
+- C4 : Capacité à expliciter le parcours de professionnalisation
+- C5 : Regard réflexif sur les compétences acquises et capacité de transfert
  
-RÈGLES ABSOLUES — RESPECTE-LES SANS EXCEPTION :
-- Tu poses UNIQUEMENT des questions. Rien d'autre.
-- INTERDIT : *je note*, *je me penche*, *je souris*, *j'ouvre le dossier*, ou toute action narrative entre astérisques.
-- INTERDIT : donner des conseils, des encouragements, des explications pendant la session.
-- Une seule question à la fois. Courte. Directe.
-- Pendant la session : questions uniquement. Feedback et conseils UNIQUEMENT sur "BILAN".
+RÈGLES ABSOLUES :
+- Tu poses UNIQUEMENT des questions. Une seule à la fois. Courte. Directe.
+- INTERDIT : *je note*, *je me penche*, *je souris*, ou toute action narrative.
+- INTERDIT : conseils ou encouragements pendant la session.
+- Demande systématiquement les annexes : "Avez-vous une annexe sur ce point ? Décrivez-la moi."
+- Feedback et conseils UNIQUEMENT sur "BILAN".
  
-${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 questions approfondies sur ce seul critère.` : `Critères à explorer : C1 Productions, C2 Contextes, C3 Choix créatifs, C4 Parcours, C5 Regard réflexif.`}
-${sévère ? `MODE SÉVÈRE : Relance systématiquement sur chaque réponse vague. "Soyez plus précis.", "Donnez un exemple concret.", "Qu'est-ce qui vous permet de dire ça ?" Tu attends des faits, des chiffres, des noms de projets.` : ""}
- 
-Commence directement par ta première question, sans introduction.
- 
-Sur "BILAN" :
-- Pour chaque critère évalué (C1 à C5), donne : niveau (Insuffisant / Fragile / Satisfaisant / Excellent) + note /20.
-- Évalue aussi l'expression orale : syntaxe, vocabulaire professionnel, clarté, hésitations.
-- Sois SÉVÈRE : une réponse vague, sans exemple concret ou sans chiffres = Insuffisant ou Fragile. Seules les réponses précises, structurées et illustrées méritent Satisfaisant ou Excellent.
-- Note globale /20 + 3 axes de progression prioritaires (fond ET forme).`;
- 
-const makeSystemP2 = (ciblé=null, sévère=false) => `Tu es un jury de BTS Communication — Partie 2 : Dossier projets (20 min).
- 
-RÈGLES ABSOLUES — RESPECTE-LES SANS EXCEPTION :
-- Tu poses UNIQUEMENT des questions. Rien d'autre.
-- INTERDIT : *je note*, *je me penche*, *je souris*, *j'ouvre le dossier*, ou toute action narrative entre astérisques.
-- INTERDIT : donner des conseils, des encouragements, des explications pendant la session.
-- Une seule question à la fois. Courte. Directe.
-- Pendant la session : questions uniquement. Feedback et conseils UNIQUEMENT sur "BILAN".
- 
-${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 questions approfondies.` : `Compétences à explorer : C1 Veille, C2 Création, C3 Production/diffusion, C4 Achats, C5 Évaluation.`}
-${sévère ? `MODE SÉVÈRE : Relance systématiquement. Demande des preuves concrètes, des chiffres, des documents.` : ""}
-Si annexe mentionnée, demande : "Pouvez-vous me présenter cette annexe ?"
+${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 questions approfondies.` : `Explore les 5 critères C1 à C5.`}
+${sévère ? `MODE SÉVÈRE : Relance sur chaque réponse vague. "Soyez plus précis.", "Donnez un exemple concret.", "Qu'est-ce qui vous permet de dire ça ?"` : ""}
  
 Commence directement par ta première question, sans introduction.
  
 Sur "BILAN" :
-- Pour chaque compétence évaluée (C1 à C5), donne : niveau (Insuffisant / Fragile / Satisfaisant / Excellent) + note /20.
-- Évalue aussi l'expression orale : syntaxe, vocabulaire professionnel, clarté, hésitations.
-- Sois SÉVÈRE : une réponse vague, sans exemple concret ou sans chiffres = Insuffisant ou Fragile. Seules les réponses précises, structurées et illustrées méritent Satisfaisant ou Excellent.
-- Note globale /20 + 3 axes de progression prioritaires (fond ET forme).`;
+${isSimulation ? `MODE SIMULATION — Note officielle /10 :
+Utilise la grille officielle : Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant pour chaque critère C1 à C5.
+BARÈME PLAFOND OBLIGATOIRE — applique-le strictement :
+- Candidat sans annexes ET réponses vagues/très courtes → note entre 0 et 3/10
+- Candidat avec peu ou pas d'annexes ET réponses bancales → note entre 3 et 6/10
+- Candidat avec annexes décrites ET réponses professionnelles et détaillées → note entre 6 et 10/10
+Indique clairement le palier appliqué et pourquoi.
+Format de réponse STRICT (pour parsing automatique) :
+NOTE_P1: X/10
+C1: [niveau] | [justification courte]
+C2: [niveau] | [justification courte]
+C3: [niveau] | [justification courte]
+C4: [niveau] | [justification courte]
+C5: [niveau] | [justification courte]
+EXPRESSION_ORALE: [niveau] | [commentaire]
+PALIER: [0-3 / 3-6 / 6-10] | [raison]
+POINTS_FORTS: [liste]
+POINTS_FAIBLES: [liste]
+RECOMMANDATIONS: [liste]` : `MODE ENTRAÎNEMENT — Pas de note chiffrée :
+Pour chaque critère C1 à C5 : niveau (Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant).
+Checklist de ce qui manquait concrètement pour chaque critère.
+Évalue l'expression orale séparément.
+3-5 recommandations prioritaires actionnables.
+Format STRICT :
+APPRECIATION_GLOBALE: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
+C1: [niveau] | [ce qui manquait]
+C2: [niveau] | [ce qui manquait]
+C3: [niveau] | [ce qui manquait]
+C4: [niveau] | [ce qui manquait]
+C5: [niveau] | [ce qui manquait]
+EXPRESSION_ORALE: [niveau] | [commentaire]
+CHECKLIST_MANQUANTS: [liste des éléments absents]
+RECOMMANDATIONS: [liste]`}`;
+ 
+const makeSystemP2 = (ciblé=null, sévère=false, isSimulation=false) => `Tu es un jury de BTS Communication — Partie 2 : Dossier projets (20 min).
+Grille officielle BTS Com E6 Bloc 2 — Partie 2 (note /10) :
+- C1 : Mettre en œuvre une veille créative et technologique
+- C2 : Créer des contenus et des solutions de communication
+- C3 : Produire et diffuser des solutions de communication
+- C4 : Acheter des prestations
+- C5 : Contrôler et évaluer les solutions de communication
+ 
+RÈGLES ABSOLUES :
+- Tu poses UNIQUEMENT des questions. Une seule à la fois. Courte. Directe.
+- INTERDIT : *je note*, *je me penche*, ou toute action narrative.
+- INTERDIT : conseils ou encouragements pendant la session.
+- Demande systématiquement les annexes : "Avez-vous une annexe sur ce point ? Décrivez-la moi."
+- Feedback et conseils UNIQUEMENT sur "BILAN".
+ 
+${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 questions approfondies.` : `Explore les 5 compétences C1 à C5.`}
+${sévère ? `MODE SÉVÈRE : Relance sur chaque réponse vague. Demande des preuves, des chiffres, des documents.` : ""}
+ 
+Commence directement par ta première question, sans introduction.
+ 
+Sur "BILAN" :
+${isSimulation ? `MODE SIMULATION — Note officielle /10 :
+Utilise la grille officielle : Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant pour chaque critère C1 à C5.
+BARÈME PLAFOND OBLIGATOIRE — applique-le strictement :
+- Candidat sans annexes ET réponses vagues/très courtes → note entre 0 et 3/10
+- Candidat avec peu ou pas d'annexes ET réponses bancales → note entre 3 et 6/10
+- Candidat avec annexes décrites ET réponses professionnelles et détaillées → note entre 6 et 10/10
+Indique clairement le palier appliqué et pourquoi.
+Format de réponse STRICT (pour parsing automatique) :
+NOTE_P2: X/10
+C1: [niveau] | [justification courte]
+C2: [niveau] | [justification courte]
+C3: [niveau] | [justification courte]
+C4: [niveau] | [justification courte]
+C5: [niveau] | [justification courte]
+EXPRESSION_ORALE: [niveau] | [commentaire]
+PALIER: [0-3 / 3-6 / 6-10] | [raison]
+POINTS_FORTS: [liste]
+POINTS_FAIBLES: [liste]
+RECOMMANDATIONS: [liste]` : `MODE ENTRAÎNEMENT — Pas de note chiffrée :
+Pour chaque critère C1 à C5 : niveau (Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant).
+Checklist de ce qui manquait concrètement pour chaque critère.
+Évalue l'expression orale séparément.
+3-5 recommandations prioritaires actionnables.
+Format STRICT :
+APPRECIATION_GLOBALE: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
+C1: [niveau] | [ce qui manquait]
+C2: [niveau] | [ce qui manquait]
+C3: [niveau] | [ce qui manquait]
+C4: [niveau] | [ce qui manquait]
+C5: [niveau] | [ce qui manquait]
+EXPRESSION_ORALE: [niveau] | [commentaire]
+CHECKLIST_MANQUANTS: [liste des éléments absents]
+RECOMMANDATIONS: [liste]`}`;
  
 const PHASES = [
   { id:"p0", label:"Présentation personnelle", duration:5*60, icon:"🎤", intro:"Chrono lancé. Présente-toi pendant 5 minutes sans interruption, puis appuie sur Terminer." },
@@ -259,51 +327,108 @@ function useTTS(muted) {
  
 // ─── PARSING DU BILAN ─────────────────────────────────────────────────────────
  
-function parseBilan(text) {
+const LEVELS_OFFICIAL = ["Très insuffisant", "Insuffisant", "Satisfaisant", "Très satisfaisant"];
+const LEVEL_COLORS = {
+  "Très insuffisant": C.danger,
+  "Insuffisant": "#F97316",
+  "Satisfaisant": "#2563EB",
+  "Très satisfaisant": C.success,
+};
+const LEVEL_BG = {
+  "Très insuffisant": C.dangerLight,
+  "Insuffisant": "#FEF3C7",
+  "Satisfaisant": "#DBEAFE",
+  "Très satisfaisant": C.successLight,
+};
+ 
+const CRITERIA_LABELS_P1 = {
+  C1: "Pertinence, efficacité et diversité des productions",
+  C2: "Expliciter les productions, contextes et enjeux",
+  C3: "Justifier les choix créatifs",
+  C4: "Expliciter le parcours de professionnalisation",
+  C5: "Regard réflexif et capacité de transfert",
+};
+const CRITERIA_LABELS_P2 = {
+  C1: "Veille créative et technologique",
+  C2: "Créer des contenus et solutions de communication",
+  C3: "Produire et diffuser des solutions",
+  C4: "Acheter des prestations",
+  C5: "Contrôler et évaluer les solutions",
+};
+ 
+function getLevelColor(level) { return LEVEL_COLORS[level] || C.purple; }
+function getLevelBg(level) { return LEVEL_BG[level] || C.purpleLight; }
+ 
+function parseBilan(text, phaseId, isSimulation) {
   if (!text) return null;
-  // Cherche des patterns comme "C1", "Satisfaisant", "/20", note globale
-  const criteriaMatches = [];
   const lines = text.split("\n");
  
-  // Niveaux reconnus
-  const LEVELS = ["Insuffisant", "Fragile", "Satisfaisant", "Excellent"];
-  const LEVEL_COLORS = {
-    "Insuffisant": C.danger,
-    "Fragile": C.warn,
-    "Satisfaisant": "#2563EB",
-    "Excellent": C.success,
-  };
-  const LEVEL_BG = {
-    "Insuffisant": C.dangerLight,
-    "Fragile": C.warnLight,
-    "Satisfaisant": "#DBEAFE",
-    "Excellent": C.successLight,
+  // Extraire une valeur après un label "KEY: value"
+  const extract = (key) => {
+    const line = lines.find(l => l.trim().startsWith(key + ":"));
+    return line ? line.replace(key + ":", "").trim() : null;
   };
  
-  // Cherche les critères avec niveau et note
-  lines.forEach(line => {
-    const noteMatch = line.match(/(\d{1,2})\/20/);
-    const levelMatch = LEVELS.find(l => line.includes(l));
-    const labelMatch = line.match(/C[1-5][^:]*:|[•\-\*]\s*[^:]+:/);
-    if (noteMatch || levelMatch) {
-      const note = noteMatch ? parseInt(noteMatch[1]) : null;
-      const level = levelMatch || null;
-      // Extraire le label du critère
-      let label = "";
-      const cMatch = line.match(/C([1-5])/);
-      if (cMatch) label = `Critère ${cMatch[0]}`;
-      if (labelMatch) label = labelMatch[0].replace(/[•\-\*:]/g, "").trim();
-      if (label || note || level) {
-        criteriaMatches.push({ label, note, level, color: LEVEL_COLORS[level] || C.purple, bg: LEVEL_BG[level] || C.purpleLight });
-      }
-    }
-  });
+  // Extraire le niveau depuis une ligne "Cx: [niveau] | ..."
+  const extractCriteria = (key) => {
+    const line = lines.find(l => l.trim().startsWith(key + ":"));
+    if (!line) return null;
+    const val = line.replace(key + ":", "").trim();
+    const parts = val.split("|");
+    const level = LEVELS_OFFICIAL.find(l => parts[0].includes(l)) || null;
+    const comment = parts[1] ? parts[1].trim() : "";
+    return { level, comment };
+  };
  
-  // Note globale
-  const globalMatch = text.match(/(?:note globale|moyenne|total)[^\d]*(\d{1,2})\/20/i);
-  const globalNote = globalMatch ? parseInt(globalMatch[1]) : null;
+  // Extraire une liste après un label
+  const extractList = (key) => {
+    const line = lines.find(l => l.trim().startsWith(key + ":"));
+    if (!line) return [];
+    const val = line.replace(key + ":", "").trim();
+    return val.split(/[;,•\-]/).map(s => s.trim()).filter(s => s.length > 3);
+  };
  
-  return { criteria: criteriaMatches, globalNote, raw: text };
+  const criteriaLabels = phaseId === "p1" ? CRITERIA_LABELS_P1 : CRITERIA_LABELS_P2;
+ 
+  if (isSimulation) {
+    const noteKey = phaseId === "p1" ? "NOTE_P1" : "NOTE_P2";
+    const noteStr = extract(noteKey);
+    const note = noteStr ? parseInt(noteStr) : null;
+    const criteria = ["C1","C2","C3","C4","C5"].map(k => {
+      const c = extractCriteria(k);
+      return {
+        key: k,
+        label: criteriaLabels[k] || k,
+        level: c?.level || null,
+        comment: c?.comment || "",
+        color: getLevelColor(c?.level),
+        bg: getLevelBg(c?.level),
+      };
+    });
+    const oral = extractCriteria("EXPRESSION_ORALE");
+    const palier = extract("PALIER");
+    const pointsForts = extractList("POINTS_FORTS");
+    const pointsFaibles = extractList("POINTS_FAIBLES");
+    const reco = extractList("RECOMMANDATIONS");
+    return { type: "simulation", note, criteria, oral, palier, pointsForts, pointsFaibles, recommandations: reco, raw: text };
+  } else {
+    const appreciation = extract("APPRECIATION_GLOBALE");
+    const criteria = ["C1","C2","C3","C4","C5"].map(k => {
+      const c = extractCriteria(k);
+      return {
+        key: k,
+        label: criteriaLabels[k] || k,
+        level: c?.level || null,
+        comment: c?.comment || "",
+        color: getLevelColor(c?.level),
+        bg: getLevelBg(c?.level),
+      };
+    });
+    const oral = extractCriteria("EXPRESSION_ORALE");
+    const checklist = extractList("CHECKLIST_MANQUANTS");
+    const reco = extractList("RECOMMANDATIONS");
+    return { type: "entrainement", appreciation, criteria, oral, checklist, recommandations: reco, raw: text };
+  }
 }
  
 // ─── COMPOSANTS ───────────────────────────────────────────────────────────────
@@ -338,26 +463,35 @@ const FicheDetail = ({ fiche, onClose }) => (
  
 // ─── SCORE CARD ───────────────────────────────────────────────────────────────
  
-const ScoreCard = ({ note, label, level, color, bg }) => {
-  const pct = note ? (note / 20) * 100 : 0;
-  return (
-    <div style={{ background: bg || C.purpleLight, borderRadius: 14, padding: "12px 14px", marginBottom: 10, border: `1.5px solid ${color || C.purple}` }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: C.text, flex: 1, paddingRight: 8 }}>{label}</span>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          {level && (
-            <span style={{ fontSize: 11, fontWeight: 700, color, background: "#fff", borderRadius: 20, padding: "3px 10px", border: `1px solid ${color}` }}>{level}</span>
-          )}
-          {note !== null && (
-            <span style={{ fontSize: 18, fontWeight: 800, color }}>{note}<span style={{ fontSize: 12, fontWeight: 500, color: C.textSub }}>/20</span></span>
-          )}
-        </div>
-      </div>
-      {note !== null && (
-        <div style={{ height: 5, background: "rgba(0,0,0,0.08)", borderRadius: 3 }}>
-          <div style={{ height: 5, borderRadius: 3, background: color || C.purple, width: `${pct}%`, transition: "width 0.6s ease" }} />
-        </div>
+const CritereCard = ({ label, level, comment, color, bg }) => (
+  <div style={{ background: bg || C.purpleLight, borderRadius: 14, padding: "12px 14px", marginBottom: 8, border: `1.5px solid ${color || C.purple}` }}>
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: comment ? 6 : 0 }}>
+      <span style={{ fontSize: 13, fontWeight: 600, color: C.text, flex: 1 }}>{label}</span>
+      {level && (
+        <span style={{ fontSize: 11, fontWeight: 700, color, background: "#fff", borderRadius: 20, padding: "3px 10px", border: `1px solid ${color}`, flexShrink: 0, whiteSpace: "nowrap" }}>{level}</span>
       )}
+    </div>
+    {comment && <div style={{ fontSize: 12, color: C.textSub, lineHeight: 1.5 }}>{comment}</div>}
+  </div>
+);
+ 
+const NoteBar = ({ note, max = 10, color }) => {
+  const pct = (note / max) * 100;
+  return (
+    <div style={{ height: 6, background: "rgba(0,0,0,0.08)", borderRadius: 3, marginTop: 6 }}>
+      <div style={{ height: 6, borderRadius: 3, background: color, width: `${pct}%`, transition: "width 0.8s ease" }} />
+    </div>
+  );
+};
+ 
+const AppreciationBadge = ({ level }) => {
+  const color = getLevelColor(level);
+  const bg = getLevelBg(level);
+  const icons = { "Très insuffisant": "🔴", "Insuffisant": "🟠", "Satisfaisant": "🔵", "Très satisfaisant": "🟢" };
+  return (
+    <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: bg, border: `2px solid ${color}`, borderRadius: 14, padding: "8px 16px" }}>
+      <span style={{ fontSize: 18 }}>{icons[level] || "⚪"}</span>
+      <span style={{ fontSize: 15, fontWeight: 700, color }}>{level || "—"}</span>
     </div>
   );
 };
@@ -416,11 +550,11 @@ export default function App() {
  
   const refreshHistory = async () => { const h = await loadHistory(); setHistory(h); };
  
-  const getSystem = (p, c = null) => {
+  const getSystem = (p, c = null, isSim = false) => {
     const sev = juryMode === "sévère";
     if (p.id === "p0") return SYSTEM_P0;
-    if (p.id === "p1") return makeSystemP1(c?.label || null, sev);
-    return makeSystemP2(c?.label || null, sev);
+    if (p.id === "p1") return makeSystemP1(c?.label || null, sev, isSim);
+    return makeSystemP2(c?.label || null, sev, isSim);
   };
  
   const callAI = async (msgs, system) => {
@@ -517,11 +651,12 @@ export default function App() {
     } else {
       feedbackMsgs = [...messages, { role: "user", content: "BILAN" }];
     }
-    const sys = getSystem(phase, ciblé);
+    const isSimulation = mode === "full";
+    const sys = getSystem(phase, ciblé, isSimulation);
     const bilan = await callAI(feedbackMsgs, sys);
     const allMsgs = [...messages, { role: "assistant", content: bilan }];
     setMessages(allMsgs);
-    const parsed = parseBilan(bilan);
+    const parsed = parseBilan(bilan, phase.id, isSimulation);
     setParsedBilan(parsed);
     const session = { date: new Date().toLocaleDateString("fr-FR"), phase: phase.label, ciblé: ciblé?.label || null, juryMode, bilan };
     await saveSession(session);
@@ -885,40 +1020,145 @@ export default function App() {
       )}
  
       {/* ── FEEDBACK ─────────────────────────────────────────────────────────── */}
-      {screen === "feedback" && (
+      {screen === "feedback" && (() => {
+        const pb = parsedBilan;
+        const isSimFeedback = pb?.type === "simulation";
+        const noteColor = pb?.note >= 6 ? (pb?.note >= 8 ? C.success : "#2563EB") : C.danger;
+        return (
         <div style={{ maxWidth: 520, margin: "0 auto", paddingBottom: "2.5rem" }}>
           {/* Hero */}
           <div style={{ background: C.grad, padding: "1.5rem", borderRadius: "0 0 24px 24px", marginBottom: "1.5rem" }}>
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em" }}>Retour du jury</div>
-            <h2 style={{ fontSize: 22, fontWeight: 700, color: "#fff", margin: "0 0 8px" }}>{ciblé ? `Entraînement — ${ciblé.label}` : phase.label}</h2>
-            {parsedBilan?.globalNote && (
-              <div style={{ display: "inline-flex", alignItems: "baseline", gap: 4, background: "rgba(255,255,255,0.2)", borderRadius: 12, padding: "6px 14px" }}>
-                <span style={{ fontSize: 28, fontWeight: 800, color: "#fff" }}>{parsedBilan.globalNote}</span>
-                <span style={{ fontSize: 14, color: "rgba(255,255,255,0.8)", fontWeight: 500 }}>/20</span>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+              {isSimFeedback ? "Simulation — Résultat officiel" : "Entraînement — Retour du jury"}
+            </div>
+            <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", margin: "0 0 10px" }}>
+              {ciblé ? ciblé.label : phase.label}
+            </h2>
+            {isSimFeedback && pb?.note != null ? (
+              <div style={{ display: "flex", alignItems: "baseline", gap: 6, background: "rgba(255,255,255,0.2)", borderRadius: 14, padding: "8px 16px", width: "fit-content" }}>
+                <span style={{ fontSize: 36, fontWeight: 800, color: "#fff" }}>{pb.note}</span>
+                <span style={{ fontSize: 16, color: "rgba(255,255,255,0.8)" }}>/10</span>
+                <span style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginLeft: 4 }}>
+                  {phase.id === "p1" ? "Partie 1" : "Partie 2"}
+                </span>
               </div>
-            )}
+            ) : pb?.appreciation ? (
+              <AppreciationBadge level={pb.appreciation} />
+            ) : null}
           </div>
  
           <div style={{ padding: "0 1.25rem" }}>
-            {/* Notes par critère */}
-            {parsedBilan?.criteria && parsedBilan.criteria.length > 0 && (
+ 
+            {/* ─ SIMULATION : grille officielle ─ */}
+            {isSimFeedback && pb?.criteria && (
               <div style={{ marginBottom: "1.5rem" }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Notes par critère</div>
-                {parsedBilan.criteria.map((c, i) => (
-                  <ScoreCard key={i} {...c} />
-                ))}
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Grille officielle</div>
+                {pb.criteria.map((c, i) => <CritereCard key={i} {...c} />)}
+                {pb.oral && (
+                  <CritereCard label="Expression orale" level={pb.oral.level} comment={pb.oral.comment} color={getLevelColor(pb.oral.level)} bg={getLevelBg(pb.oral.level)} />
+                )}
+                {pb.palier && (
+                  <div style={{ background: C.warnLight, borderRadius: 12, padding: "10px 14px", marginTop: 8, fontSize: 13, color: C.warn, borderLeft: `3px solid ${C.warn}` }}>
+                    <strong>Palier appliqué :</strong> {pb.palier}
+                  </div>
+                )}
+                {pb.note != null && (
+                  <div style={{ background: C.bg2, borderRadius: 14, padding: "14px 16px", marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Note {phase.id === "p1" ? "Partie 1" : "Partie 2"}</span>
+                    <div style={{ textAlign: "right" }}>
+                      <span style={{ fontSize: 28, fontWeight: 800, color: noteColor }}>{pb.note}</span>
+                      <span style={{ fontSize: 14, color: C.textSub }}>/10</span>
+                      <NoteBar note={pb.note} max={10} color={noteColor} />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
  
-            {/* Feedback complet */}
-            <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Feedback complet du jury</div>
-            <div style={{ background: C.bg2, borderRadius: 16, padding: "16px", fontSize: 14, lineHeight: 1.8, marginBottom: "1.5rem", whiteSpace: "pre-wrap", borderLeft: `4px solid ${C.purple}` }}>
-              {messages.filter(m => m.role === "assistant").slice(-1)[0]?.content}
-            </div>
+            {/* ─ ENTRAÎNEMENT : appréciation + checklist ─ */}
+            {!isSimFeedback && pb?.criteria && (
+              <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Évaluation par critère</div>
+                {pb.criteria.map((c, i) => <CritereCard key={i} {...c} />)}
+                {pb.oral && (
+                  <CritereCard label="Expression orale" level={pb.oral.level} comment={pb.oral.comment} color={getLevelColor(pb.oral.level)} bg={getLevelBg(pb.oral.level)} />
+                )}
+              </div>
+            )}
+ 
+            {/* Checklist manquants (entraînement) */}
+            {!isSimFeedback && pb?.checklist?.length > 0 && (
+              <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Ce qui manquait</div>
+                <div style={{ background: C.dangerLight, borderRadius: 14, padding: "12px 14px" }}>
+                  {pb.checklist.map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
+                      <span style={{ color: C.danger, fontWeight: 700, flexShrink: 0 }}>✕</span>
+                      <span style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+ 
+            {/* Points forts (simulation) */}
+            {isSimFeedback && pb?.pointsForts?.length > 0 && (
+              <div style={{ marginBottom: "1rem" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Points forts</div>
+                <div style={{ background: C.successLight, borderRadius: 14, padding: "12px 14px" }}>
+                  {pb.pointsForts.map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
+                      <span style={{ color: C.success, fontWeight: 700, flexShrink: 0 }}>✓</span>
+                      <span style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+ 
+            {/* Points faibles (simulation) */}
+            {isSimFeedback && pb?.pointsFaibles?.length > 0 && (
+              <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Points à améliorer</div>
+                <div style={{ background: C.dangerLight, borderRadius: 14, padding: "12px 14px" }}>
+                  {pb.pointsFaibles.map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: 8, marginBottom: 6, alignItems: "flex-start" }}>
+                      <span style={{ color: C.danger, fontWeight: 700, flexShrink: 0 }}>✕</span>
+                      <span style={{ fontSize: 13, color: C.text, lineHeight: 1.5 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+ 
+            {/* Recommandations */}
+            {pb?.recommandations?.length > 0 && (
+              <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Recommandations</div>
+                <div style={{ background: C.purpleLight, borderRadius: 14, padding: "12px 14px" }}>
+                  {pb.recommandations.map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}>
+                      <span style={{ background: C.grad, color: "#fff", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0, marginTop: 1 }}>{i+1}</span>
+                      <span style={{ fontSize: 13, color: C.purpleDark, lineHeight: 1.5 }}>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+ 
+            {/* Feedback brut si parsing insuffisant */}
+            {(!pb || (!pb.criteria?.length && !pb.appreciation)) && (
+              <>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Feedback du jury</div>
+                <div style={{ background: C.bg2, borderRadius: 16, padding: "16px", fontSize: 14, lineHeight: 1.8, marginBottom: "1.5rem", whiteSpace: "pre-wrap", borderLeft: `4px solid ${C.purple}` }}>
+                  {messages.filter(m => m.role === "assistant").slice(-1)[0]?.content}
+                </div>
+              </>
+            )}
  
             {/* Échanges */}
             <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Échanges de la session</div>
-            <div style={{ background: C.bg2, borderRadius: 16, padding: "12px 16px", marginBottom: "1.5rem", maxHeight: 280, overflowY: "auto" }}>
+            <div style={{ background: C.bg2, borderRadius: 16, padding: "12px 16px", marginBottom: "1.5rem", maxHeight: 260, overflowY: "auto" }}>
               {messages.slice(0, -1).map((m, i) => (
                 <div key={i} style={{ marginBottom: 12 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: m.role === "assistant" ? C.purple : C.pink, marginBottom: 3, textTransform: "uppercase" }}>{m.role === "assistant" ? "Jury" : "Toi"}</div>
@@ -938,7 +1178,8 @@ export default function App() {
             </button>
           </div>
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
