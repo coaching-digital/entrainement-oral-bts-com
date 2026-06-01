@@ -118,6 +118,7 @@ ${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 que
 ${sévère ? `MODE SÉVÈRE : Relance sur chaque réponse vague. "Soyez plus précis.", "Donnez un exemple concret.", "Qu'est-ce qui vous permet de dire ça ?"` : ""}
 
 Commence directement par ta première question, sans introduction.
+IMPORTANT : commence par un critère choisi aléatoirement parmi C1 à C5 — ne commence JAMAIS par C1 systématiquement. Varie l'ordre à chaque session.
 
 Sur "BILAN" :
 ${isSimulation ? `MODE SIMULATION — Note officielle /10 :
@@ -191,6 +192,7 @@ ${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 que
 ${sévère ? `MODE SÉVÈRE : Relance sur chaque réponse vague. Demande des preuves, des chiffres, des documents.` : ""}
 
 Commence directement par ta première question, sans introduction.
+IMPORTANT : commence par un critère choisi aléatoirement parmi C1 à C5 — ne commence JAMAIS par C1 systématiquement. Varie l'ordre à chaque session.
 
 Sur "BILAN" :
 ${isSimulation ? `MODE SIMULATION — Note officielle /10 :
