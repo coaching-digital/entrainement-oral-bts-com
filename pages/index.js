@@ -1122,10 +1122,7 @@ export default function App() {
             margin-left: calc((100% - 100% / 1.45) / 2);
           }
           .session-container {
-            transform-origin: top center;
-            transform: scale(1.45);
-            width: calc(100% / 1.45);
-            margin-left: calc((100% - 100% / 1.45) / 2);
+            zoom: 1.45;
             height: calc(100vh / 1.45);
           }
           /* Grille 3 colonnes pour les 3 parties */
