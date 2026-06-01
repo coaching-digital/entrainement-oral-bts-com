@@ -1101,38 +1101,46 @@ export default function App() {
           .mic-btn svg { width:26px; height:26px; }
         }
 
-        /* ── DESKTOP (≥1024px) ── */
-        @media (min-width: 1024px) {
-          .page-container { max-width: 720px; }
-          .session-container { max-width: 860px; }
-          .home-hero { padding:3rem 3rem 2.5rem; border-radius:0 0 32px 32px; }
-          .home-hero h1 { font-size:36px; }
-          .home-tabs { padding:10px 12px; }
-          .home-content { padding:2rem 3rem; }
-          .session-header { padding:1.25rem 2rem; }
-          .timer-display { font-size:36px; }
-          .msg-area { padding:1.5rem 2rem; }
-          .controls-area { padding:1.25rem 2rem 1.5rem; }
-          .feedback-hero { padding:2.5rem 3rem; }
-          .feedback-content { padding:0 3rem; }
-          .msg-jury, .msg-cand { font-size:15px; max-width: 80%; }
-          .mic-btn { width:80px; height:80px; }
-          .mic-btn svg { width:30px; height:30px; }
-          /* Grille 3 colonnes pour les 3 parties */
-          .phases-grid { display:grid !important; grid-template-columns: repeat(3,1fr); gap:12px; }
-          .phases-grid > * { margin-bottom: 0 !important; }
-          /* Grille 2 colonnes pour les critères */
-          .criteria-grid { display:grid !important; grid-template-columns: 1fr 1fr; gap:8px; }
-          .criteria-grid > * { margin-bottom: 0 !important; }
-        }
         /* ── TABLETTE large (≥768px) ── */
         @media (min-width: 768px) {
-          .page-container { max-width: 640px; }
-          .home-hero { padding:2.5rem 2rem 2rem; }
+          .page-container { max-width: 680px; }
+          .home-hero { padding:2.5rem 2.5rem 2rem; }
           .home-hero h1 { font-size:30px; }
-          .home-content { padding:1.5rem 2rem; }
-          .feedback-hero { padding:2rem; }
-          .feedback-content { padding:0 2rem; }
+          .home-content { padding:1.5rem 2.5rem; }
+          .feedback-hero { padding:2rem 2.5rem; }
+          .feedback-content { padding:0 2.5rem; }
+        }
+        /* ── DESKTOP (≥1024px) ── */
+        @media (min-width: 1024px) {
+          .page-container { max-width: 90vw; max-width: min(900px, 92vw); }
+          .session-container { max-width: min(980px, 94vw); }
+          .home-hero { padding:3.5rem 4rem 3rem; border-radius:0 0 36px 36px; }
+          .home-hero h1 { font-size:40px; }
+          .home-hero p { font-size:16px; }
+          .home-tabs { padding:10px 14px; gap:8px; }
+          .tab-btn { font-size:14px; padding:12px 8px; }
+          .home-content { padding:2rem 4rem 3rem; }
+          .session-header { padding:1.25rem 2.5rem; }
+          .timer-display { font-size:38px; }
+          .msg-area { padding:1.5rem 2.5rem; }
+          .controls-area { padding:1.25rem 2.5rem 1.5rem; }
+          .feedback-hero { padding:3rem 4rem; }
+          .feedback-content { padding:0 4rem 2rem; }
+          .msg-jury, .msg-cand { font-size:15px; max-width:78%; }
+          .mic-btn { width:84px; height:84px; }
+          /* Grille 3 colonnes pour les 3 parties — texte bien aéré */
+          .phases-grid { display:grid !important; grid-template-columns:repeat(3,1fr); gap:16px; }
+          .phases-grid > button { flex-direction:column !important; align-items:flex-start !important; padding:20px !important; margin-bottom:0 !important; height:auto; }
+          .phases-grid > button > span:first-child { font-size:28px !important; margin-bottom:8px; }
+          .phases-grid .phase-label { font-size:15px !important; }
+          .phases-grid .phase-sub { font-size:13px !important; }
+          .phases-grid .phase-time { font-size:13px !important; align-self:flex-end; margin-top:auto; }
+          /* Grille 2 colonnes pour les critères */
+          .criteria-grid { display:grid !important; grid-template-columns:1fr 1fr; gap:10px; }
+          .criteria-grid > * { margin-bottom:0 !important; }
+          /* Simulation complète plus grande */
+          .sim-btn { padding:22px 28px !important; }
+          .sim-btn span[style*="fontSize: 28"] { font-size:36px !important; }
         }
 
         /* Utilitaires responsive */
@@ -1180,7 +1188,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <button onClick={startFull} style={{ width: "100%", padding: "16px", borderRadius: 18, border: `2px solid ${C.purple}`, background: C.purpleLight, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 14, marginBottom: "1.25rem" }}>
+                <button onClick={startFull} className="sim-btn" style={{ width: "100%", padding: "16px", borderRadius: 18, border: `2px solid ${C.purple}`, background: C.purpleLight, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 14, marginBottom: "1.25rem" }}>
                   <span style={{ fontSize: 28 }}>🚀</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: 15, color: C.purpleDark, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -1198,10 +1206,10 @@ export default function App() {
                   <button key={p.id} onClick={() => startPhase(i, "single")} style={{ width: "100%", padding: "14px 16px", borderRadius: 16, border: `1px solid ${C.border}`, background: C.bg, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", gap: 14, marginBottom: 10 }}>
                     <span style={{ fontSize: 22, minWidth: 28, textAlign: "center" }}>{p.icon}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontWeight: 500, fontSize: 14 }}>{p.label}</div>
-                      <div style={{ fontSize: 12, color: C.textSub, marginTop: 1 }}>{p.id === "p0" ? "Monologue guidé" : p.id === "p1" ? "5 critères — portfolio" : "5 compétences métier"}</div>
+                      <div className="phase-label" style={{ fontWeight: 500, fontSize: 14 }}>{p.label}</div>
+                      <div className="phase-sub" style={{ fontSize: 12, color: C.textSub, marginTop: 1 }}>{p.id === "p0" ? "Monologue guidé" : p.id === "p1" ? "5 critères — portfolio" : "5 compétences métier"}</div>
                     </div>
-                    <span style={{ fontSize: 12, color: C.textSub, flexShrink: 0 }}>{p.id === "p0" ? "5 min" : p.id === "p1" ? "15 min" : "20 min"}</span>
+                    <span className="phase-time" style={{ fontSize: 12, color: C.textSub, flexShrink: 0 }}>{p.id === "p0" ? "5 min" : p.id === "p1" ? "15 min" : "20 min"}</span>
                   </button>
                 ))}
                 </div>
