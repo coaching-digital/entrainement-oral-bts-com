@@ -874,30 +874,43 @@ export default function App() {
   const endPhase = async () => {
     setRunning(false); stopTTS();
     recognitionRef.current?.stop(); setRecording(false);
-    let feedbackMsgs;
-    let transitionMsg = null;
+
     if (phase.id === "p0") {
       const mono = monoRef.current.trim();
-      // Phrase de transition
-      transitionMsg = "Merci pour cette présentation. Nous pouvons à présent passer à la suite de votre épreuve.";
-      speak(transitionMsg);
-      if (!mono) {
-        setMessages([{ role: "assistant", content: transitionMsg }]);
-        setScreen("feedback");
-        return;
-      }
-      // Demander le feedback structuré via SYSTEM_P0
-      feedbackMsgs = [{ role: "user", content: "Voici la présentation personnelle du candidat : \"" + mono + "\". BILAN" }];
-    } else {
-      feedbackMsgs = [...messages, { role: "user", content: "BILAN" }];
+      // Basculer immédiatement vers feedback avec état chargement
+      setScreen("feedback");
+      setParsedBilan(null);
+      if (!mono) return;
+      // Appel IA en arrière-plan
+      const feedbackMsgs = [{ role: "user", content: "Voici la présentation personnelle du candidat à l'oral du BTS Communication E6 Bloc 2 : \"" + mono + "\". BILAN" }];
+      const sys = SYSTEM_P0;
+      const bilan = await callAI(feedbackMsgs, sys);
+      const parsed = parseBilan(bilan, "p0", false);
+      setParsedBilan(parsed);
+      const allMsgs = [{ role: "assistant", content: bilan }];
+      setMessages(allMsgs);
+      const session = {
+        date: new Date().toLocaleDateString("fr-FR"),
+        phase: phase.label,
+        phaseId: "p0",
+        ciblé: null,
+        juryMode,
+        bilan,
+        mode,
+        parsedBilan: parsed,
+        messages: allMsgs,
+      };
+      await saveSession(session);
+      await refreshHistory();
+      return;
     }
+
+    // P1 / P2
+    const feedbackMsgs = [...messages, { role: "user", content: "BILAN" }];
     const isSimulation = mode === "full";
     const sys = getSystem(phase, ciblé, isSimulation);
     const bilan = await callAI(feedbackMsgs, sys);
-    // Pour P0 : on garde la phrase de transition + le bilan
-    const allMsgs = phase.id === "p0"
-      ? [{ role: "assistant", content: transitionMsg }, { role: "assistant", content: bilan }]
-      : [...messages, { role: "assistant", content: bilan }];
+    const allMsgs = [...messages, { role: "assistant", content: bilan }];
     setMessages(allMsgs);
     const parsed = parseBilan(bilan, phase.id, isSimulation);
     setParsedBilan(parsed);
@@ -1468,13 +1481,14 @@ export default function App() {
         const pb = parsedBilan;
         const isSimFeedback = pb?.type === "simulation";
         const isP0Feedback = pb?.type === "p0";
+        const isLoadingP0 = phase.id === "p0" && !pb && loading;
         const noteColor = pb?.note >= 6 ? (pb?.note >= 8 ? C.success : "#2563EB") : C.danger;
         return (
         <div className="page-container">
           {/* Hero */}
           <div className="feedback-hero" style={{ background: C.grad, borderRadius: "0 0 24px 24px", marginBottom: "1.5rem" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em" }}>
-              {isSimFeedback ? "Simulation — Résultat officiel" : "Entraînement — Retour du jury"}
+              {isSimFeedback ? "Simulation — Résultat officiel" : "Retour du jury"}
             </div>
             <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", margin: "0 0 10px" }}>
               {ciblé ? ciblé.label : phase.label}
@@ -1489,10 +1503,23 @@ export default function App() {
               </div>
             ) : pb?.appreciation ? (
               <AppreciationBadge level={pb.appreciation} />
+            ) : isLoadingP0 ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.2)", borderRadius: 12, padding: "8px 14px", width: "fit-content" }}>
+                <div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+                <span style={{ fontSize: 13, color: "#fff" }}>Analyse en cours…</span>
+              </div>
             ) : null}
           </div>
 
           <div className="feedback-content">
+            {/* Spinner P0 chargement */}
+            {isLoadingP0 && (
+              <div style={{ textAlign: "center", padding: "3rem 0", color: C.textSub }}>
+                <div style={{ width: 32, height: 32, border: `3px solid ${C.purpleLight}`, borderTopColor: C.purple, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+                <div style={{ fontSize: 14, fontWeight: 500 }}>Le jury analyse votre présentation…</div>
+                <div style={{ fontSize: 12, marginTop: 6 }}>Évaluation des 5 points obligatoires</div>
+              </div>
+            )}
             <div ref={bilanRef} style={{ background: "#ffffff", paddingBottom: 8 }}>
 
             {/* ─ P0 : présentation personnelle ─ */}
