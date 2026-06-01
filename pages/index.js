@@ -85,18 +85,41 @@ const FICHES = {
 // ─── SYSTEM PROMPTS ───────────────────────────────────────────────────────────
 
 const SYSTEM_P0 = `Tu es un jury de BTS Communication pour l'épreuve orale E6 Bloc 2.
-Le candidat vient de faire sa présentation personnelle de 5 minutes.
+Le candidat vient de faire sa présentation personnelle de 5 minutes (monologue sans interruption).
 
-RÈGLES ABSOLUES :
-- Tu poses UNIQUEMENT des questions. Jamais de descriptions d'actions.
-- Pas de mise en scène. Des questions courtes et directes uniquement.
-- Pendant la session : questions uniquement. Feedback UNIQUEMENT sur "BILAN".
+RÈGLE ABSOLUE : Tu n'interviens PAS pendant le monologue. Zéro question. Zéro commentaire.
+Le feedback est donné UNIQUEMENT sur "BILAN".
 
-Sur "BILAN" — feedback structuré de la présentation personnelle :
-Évalue ces points : identité et personnalité, motivations pour le BTS Com, projet professionnel, évolution du projet, poste et missions en entreprise.
-Pour chaque point : niveau (Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant) + ce qui manquait concrètement.
-Évalue aussi l'expression orale : syntaxe, niveau de langue, clarté, hésitations.
-Donne 3-5 recommandations concrètes sur ce qu'il aurait fallu dire précisément.
+Sur "BILAN" — analyse pédagogique de la présentation personnelle :
+Évalue chacun des 5 points obligatoires de la présentation personnelle BTS Com :
+
+POINT_1_NIVEAU: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
+POINT_1_BIEN: [ce qui a été bien dit sur "Qui suis-je ? — personnalité, traits, passions, appétence créative"]
+POINT_1_MANQUE: [ce qui manquait concrètement]
+POINT_1_EXEMPLE: [exemple de formulation idéale : 2-3 adjectifs illustrés + lien avec la communication]
+
+POINT_2_NIVEAU: [niveau]
+POINT_2_BIEN: [ce qui a été bien dit sur "Pourquoi le BTS Communication ?"]
+POINT_2_MANQUE: [ce qui manquait : projet réfléchi, cohérence, ce qui a séduit dans la formation]
+POINT_2_EXEMPLE: [exemple de formulation idéale]
+
+POINT_3_NIVEAU: [niveau]
+POINT_3_BIEN: [ce qui a été bien dit sur "Mon projet après le BTS"]
+POINT_3_MANQUE: [ce qui manquait : formations envisagées, noms concrets, cohérence du projet]
+POINT_3_EXEMPLE: [exemple de formulation idéale]
+
+POINT_4_NIVEAU: [niveau]
+POINT_4_BIEN: [ce qui a été bien dit sur "Le BTS a-t-il modifié mon projet ?"]
+POINT_4_MANQUE: [ce qui manquait : transformation, expérience marquante, évolution]
+POINT_4_EXEMPLE: [exemple de formulation idéale]
+
+POINT_5_NIVEAU: [niveau]
+POINT_5_BIEN: [ce qui a été bien dit sur "Mon poste et mes missions en entreprise"]
+POINT_5_MANQUE: [ce qui manquait : nom entreprise, secteur, intitulé de poste, 3-5 missions précises, niveau d'autonomie]
+POINT_5_EXEMPLE: [exemple de formulation idéale]
+
+EXPRESSION_ORALE: [niveau] | [commentaire détaillé : tics de langage ("euh", "du coup", "en fait"...), niveau de vocabulaire professionnel, débit, clarté, structure, posture]
+RECOMMANDATIONS: [3-5 axes prioritaires séparés par des points-virgules]
 PAS de note chiffrée pour la présentation personnelle.`;
 
 const makeSystemP1 = (ciblé=null, sévère=false, isSimulation=false) => `Tu es un jury de BTS Communication — Partie 1 : Parcours de professionnalisation (15 min).
@@ -453,6 +476,32 @@ function parseBilan(text, phaseId, isSimulation) {
   };
 
   const criteriaLabels = phaseId === "p1" ? CRITERIA_LABELS_P1 : CRITERIA_LABELS_P2;
+
+  // Cas spécial P0 : feedback présentation personnelle
+  if (phaseId === "p0") {
+    const POINTS_P0 = [
+      { key: "POINT_1", label: "Qui suis-je ? — Personnalité et passions" },
+      { key: "POINT_2", label: "Pourquoi le BTS Communication ?" },
+      { key: "POINT_3", label: "Mon projet après le BTS" },
+      { key: "POINT_4", label: "Le BTS a-t-il modifié mon projet ?" },
+      { key: "POINT_5", label: "Mon poste et mes missions en entreprise" },
+    ];
+    const appreciation = extract("APPRECIATION_GLOBALE") ||
+      (LEVELS_OFFICIAL.find(l => lines.slice(0,5).join(" ").includes(l)) || null);
+    const criteria = POINTS_P0.map(p => {
+      const niveau = extract(p.key + "_NIVEAU");
+      const bien = extract(p.key + "_BIEN");
+      const manque = extract(p.key + "_MANQUE");
+      const exemple = extract(p.key + "_EXEMPLE");
+      const level = niveau ? (LEVELS_OFFICIAL.find(l => niveau.includes(l)) || null) : null;
+      return { key: p.key, label: p.label, level, bien: bien || null, manque: manque || null, exemple: exemple || null, color: getLevelColor(level), bg: getLevelBg(level) };
+    }).filter(c => c.level || c.bien || c.manque);
+    const oral = extractCriteria("EXPRESSION_ORALE");
+    const reco = extract("RECOMMANDATIONS")
+      ? extract("RECOMMANDATIONS").split(/[;]/).map(s => s.trim()).filter(s => s.length > 3)
+      : extractList("RECOMMANDATIONS");
+    return { type: "p0", appreciation, criteria, oral, recommandations: reco, raw: text };
+  }
 
   if (isSimulation) {
     const noteKey = phaseId === "p1" ? "NOTE_P1" : "NOTE_P2";
@@ -992,30 +1041,84 @@ export default function App() {
     <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: C.text, minHeight: "100vh", background: C.bg }}>
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; }
         @keyframes pulse { 0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(219,39,119,0.4)} 50%{transform:scale(1.06);box-shadow:0 0 0 12px rgba(219,39,119,0)} }
         @keyframes spin { to{transform:rotate(360deg)} }
         @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
         @keyframes speakPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-        .msg-jury { background:#f3f4f6; border-radius:16px 16px 16px 4px; padding:12px 16px; margin-bottom:12px; font-size:14px; line-height:1.7; max-width:92%; animation:fadeIn 0.3s ease; }
-        .msg-cand { background:#EDE9FE; border-radius:16px 16px 4px 16px; padding:12px 16px; margin-bottom:12px; font-size:14px; line-height:1.7; max-width:92%; margin-left:auto; color:#4C1D95; animation:fadeIn 0.3s ease; }
+
+        /* Messages */
+        .msg-jury { background:#f3f4f6; border-radius:16px 16px 16px 4px; padding:12px 16px; margin-bottom:12px; font-size:14px; line-height:1.7; max-width:92%; animation:fadeIn 0.3s ease; word-break:break-word; }
+        .msg-cand { background:#EDE9FE; border-radius:16px 16px 4px 16px; padding:12px 16px; margin-bottom:12px; font-size:14px; line-height:1.7; max-width:92%; margin-left:auto; color:#4C1D95; animation:fadeIn 0.3s ease; word-break:break-word; }
+
+        /* Buttons */
         textarea:focus, input:focus { outline: 2px solid #7C3AED; }
-        .tab-btn { flex:1; padding:10px 4px; border-radius:10px; border:none; cursor:pointer; font-size:12px; transition:all 0.2s; }
+        .tab-btn { flex:1; padding:10px 4px; border-radius:10px; border:none; cursor:pointer; font-size:12px; transition:all 0.2s; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         .btn-primary { border:none; background:linear-gradient(135deg,#7C3AED 0%,#DB2777 100%); color:#fff; font-weight:700; cursor:pointer; border-radius:14px; transition:opacity 0.2s; }
         .btn-primary:active { opacity:0.85; }
         .btn-secondary { border:1px solid #e5e7eb; background:#fff; color:#1a1a1a; font-weight:500; cursor:pointer; border-radius:14px; transition:all 0.2s; }
         .btn-secondary:active { background:#f9fafb; }
-        @media (max-width: 480px) {
-          .msg-jury, .msg-cand { max-width:96%; font-size:13px; }
-          .session-header { padding:0.75rem 1rem !important; }
-          .home-hero { padding:1.5rem 1rem 1.25rem !important; }
-          .home-hero h1 { font-size:24px !important; }
+
+        /* Layout containers */
+        .page-container { width:100%; max-width:520px; margin:0 auto; padding:0 0 2rem; }
+        .session-container { width:100%; max-width:560px; margin:0 auto; display:flex; flex-direction:column; height:100dvh; }
+
+        /* ── MOBILE (défaut, <600px) ── */
+        .home-hero { padding:1.5rem 1rem 1.25rem; }
+        .home-hero h1 { font-size:24px; }
+        .home-tabs { padding:6px; }
+        .home-content { padding:1rem; }
+        .session-header { padding:0.75rem 1rem; }
+        .timer-display { font-size:26px; }
+        .msg-area { padding:0.875rem 1rem; }
+        .controls-area { padding:0.75rem 1rem 0.875rem; }
+        .feedback-hero { padding:1.25rem 1rem; }
+        .feedback-content { padding:0 1rem; }
+        .mic-btn { width:68px; height:68px; }
+        .mic-btn svg { width:24px; height:24px; }
+
+        /* ── TABLETTE (≥600px) ── */
+        @media (min-width: 600px) {
+          .home-hero { padding:2rem 1.5rem 1.75rem; }
+          .home-hero h1 { font-size:28px; }
+          .home-tabs { padding:8px; }
+          .home-content { padding:1.25rem; }
+          .session-header { padding:1rem 1.25rem; }
+          .timer-display { font-size:30px; }
+          .msg-area { padding:1rem 1.25rem; }
+          .controls-area { padding:0.875rem 1.25rem 1rem; }
+          .feedback-hero { padding:1.5rem; }
+          .feedback-content { padding:0 1.25rem; }
+          .mic-btn { width:72px; height:72px; }
+          .mic-btn svg { width:26px; height:26px; }
         }
+
+        /* ── DESKTOP (≥1024px) ── */
+        @media (min-width: 1024px) {
+          .home-hero { padding:2.5rem 2rem 2rem; border-radius:0 0 32px 32px; }
+          .home-hero h1 { font-size:32px; }
+          .home-content { padding:1.5rem 2rem; }
+          .session-header { padding:1.25rem 1.5rem; }
+          .timer-display { font-size:34px; }
+          .msg-area { padding:1.25rem 1.5rem; }
+          .controls-area { padding:1rem 1.5rem 1.25rem; }
+          .feedback-hero { padding:2rem; }
+          .feedback-content { padding:0 1.5rem; }
+          .msg-jury, .msg-cand { font-size:15px; }
+          .mic-btn { width:80px; height:80px; }
+          .mic-btn svg { width:30px; height:30px; }
+        }
+
+        /* Utilitaires responsive */
+        .text-clamp { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .flex-wrap-gap { display:flex; flex-wrap:wrap; gap:8px; }
+        img, svg { max-width:100%; }
       `}</style>
 
       {/* ── HOME ─────────────────────────────────────────────────────────────── */}
       {screen === "home" && (
-        <div style={{ maxWidth: 480, margin: "0 auto", paddingBottom: "2rem" }}>
-          <div className="home-hero" style={{ background: C.grad, padding: "2rem 1.5rem 1.75rem", borderRadius: "0 0 28px 28px", position: "relative", overflow: "hidden" }}>
+        <div className="page-container">
+          <div className="home-hero" style={{ background: C.grad, borderRadius: "0 0 28px 28px", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: -50, right: -30, width: 140, height: 140, borderRadius: "50%", background: "rgba(255,255,255,0.07)" }} />
             <div style={{ position: "absolute", bottom: -30, left: -20, width: 100, height: 100, borderRadius: "50%", background: "rgba(255,255,255,0.05)" }} />
             <div style={{ position: "relative" }}>
@@ -1030,13 +1133,13 @@ export default function App() {
             </div>
           </div>
 
-          <div style={{ display: "flex", background: C.bg2, padding: "8px", gap: 4 }}>
+          <div className="home-tabs" style={{ display: "flex", background: C.bg2, gap: 4 }}>
             {[["modes", "🎯 S'entraîner"], ["conseils", "📚 Conseils"], ["historique", "🕐 Historique"]].map(([t, label]) => (
               <button key={t} className="tab-btn" onClick={() => setTab(t)} style={{ background: tab === t ? C.bg : "transparent", color: tab === t ? C.purple : C.textSub, fontWeight: tab === t ? 600 : 400 }}>{label}</button>
             ))}
           </div>
 
-          <div style={{ padding: "1.25rem" }}>
+          <div className="home-content">
             {tab === "modes" && (
               <>
                 <div style={{ background: juryMode === "sévère" ? C.dangerLight : C.bg2, borderRadius: 16, padding: "12px 16px", marginBottom: "1.25rem", border: juryMode === "sévère" ? `2px solid ${C.danger}` : `1px solid ${C.border}` }}>
@@ -1217,7 +1320,7 @@ export default function App() {
 
       {/* ── SESSION ──────────────────────────────────────────────────────────── */}
       {screen === "session" && (
-        <div style={{ maxWidth: 560, margin: "0 auto", display: "flex", flexDirection: "column", height: "100dvh" }}>
+        <div className="session-container">
 
           {/* Modale de confirmation de sortie */}
           {showExitConfirm && (
@@ -1233,7 +1336,7 @@ export default function App() {
           )}
 
           {/* Header */}
-          <div className="session-header" style={{ background: C.grad, padding: "1rem 1.25rem", borderRadius: "0 0 20px 20px", flexShrink: 0 }}>
+          <div className="session-header" style={{ background: C.grad, borderRadius: "0 0 20px 20px", flexShrink: 0 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1266,7 +1369,7 @@ export default function App() {
                     </svg>
                   )}
                 </button>
-                <div style={{ fontSize: 28, fontWeight: 700, color: timerColor, fontVariantNumeric: "tabular-nums" }}>{fmt(timer)}</div>
+                <div className="timer-display" style={{ fontWeight: 700, color: timerColor, fontVariantNumeric: "tabular-nums" }}>{fmt(timer)}</div>
               </div>
             </div>
             <div style={{ height: 3, background: "rgba(255,255,255,0.2)", borderRadius: 2 }}>
@@ -1275,7 +1378,7 @@ export default function App() {
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem", WebkitOverflowScrolling: "touch" }}>
+          <div className="msg-area" style={{ flex: 1, overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
             <div style={{ background: C.purpleLight, borderRadius: 12, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: C.purpleDark, lineHeight: 1.6 }}>{phase.intro}</div>
             {messages.map((m, i) => (
               <div key={i} className={m.role === "assistant" ? "msg-jury" : "msg-cand"} style={{ whiteSpace: "pre-wrap" }}>
@@ -1293,7 +1396,7 @@ export default function App() {
           </div>
 
           {/* Contrôles */}
-          <div style={{ padding: "0.875rem 1.25rem 1rem", borderTop: `1px solid ${C.border}`, background: C.bg, flexShrink: 0 }}>
+          <div className="controls-area" style={{ borderTop: `1px solid ${C.border}`, background: C.bg, flexShrink: 0 }}>
             {!showTextInput ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                 {transcript && (
@@ -1302,7 +1405,7 @@ export default function App() {
                 <div style={{ display: "flex", gap: 14, alignItems: "center", justifyContent: "center", width: "100%" }}>
                   {!recording ? (
                     <>
-                      <button onClick={startRecording} disabled={loading} style={{ width: 72, height: 72, borderRadius: "50%", border: `3px solid ${C.purple}`, background: C.purpleLight, cursor: loading ? "not-allowed" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, opacity: loading ? 0.5 : 1, flexShrink: 0 }}>
+                      <button onClick={startRecording} disabled={loading} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.purple}`, background: C.purpleLight, cursor: loading ? "not-allowed" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, opacity: loading ? 0.5 : 1, flexShrink: 0 }}>
                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={C.purple} strokeWidth="2" strokeLinecap="round"><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10a7 7 0 0014 0" /><line x1="12" y1="19" x2="12" y2="22" /><line x1="8" y1="22" x2="16" y2="22" /></svg>
                         <span style={{ fontSize: 9, fontWeight: 700, color: C.purple }}>PARLER</span>
                       </button>
@@ -1315,7 +1418,7 @@ export default function App() {
                   ) : (
                     <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
                       {/* En P0 : arrêter le micro = "Continuer" (accumule sans envoyer à l'IA) */}
-                      <button onClick={stopAndSend} style={{ width: 72, height: 72, borderRadius: "50%", border: `3px solid ${C.pink}`, background: C.pinkLight, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, animation: "pulse 1.2s infinite", flexShrink: 0 }}>
+                      <button onClick={stopAndSend} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.pink}`, background: C.pinkLight, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, animation: "pulse 1.2s infinite", flexShrink: 0 }}>
                         <svg width="22" height="22" viewBox="0 0 24 24" fill={C.pink}><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
                         <span style={{ fontSize: 9, fontWeight: 700, color: C.pink }}>{phase.id === "p0" ? "PAUSE" : "ENVOYER"}</span>
                       </button>
@@ -1357,11 +1460,12 @@ export default function App() {
       {screen === "feedback" && (() => {
         const pb = parsedBilan;
         const isSimFeedback = pb?.type === "simulation";
+        const isP0Feedback = pb?.type === "p0";
         const noteColor = pb?.note >= 6 ? (pb?.note >= 8 ? C.success : "#2563EB") : C.danger;
         return (
-        <div style={{ maxWidth: 520, margin: "0 auto", paddingBottom: "2.5rem" }}>
+        <div className="page-container">
           {/* Hero */}
-          <div style={{ background: C.grad, padding: "1.5rem", borderRadius: "0 0 24px 24px", marginBottom: "1.5rem" }}>
+          <div className="feedback-hero" style={{ background: C.grad, borderRadius: "0 0 24px 24px", marginBottom: "1.5rem" }}>
             <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.1em" }}>
               {isSimFeedback ? "Simulation — Résultat officiel" : "Entraînement — Retour du jury"}
             </div>
@@ -1381,8 +1485,65 @@ export default function App() {
             ) : null}
           </div>
 
-          <div style={{ padding: "0 1.25rem" }}>
+          <div className="feedback-content">
             <div ref={bilanRef} style={{ background: "#ffffff", paddingBottom: 8 }}>
+
+            {/* ─ P0 : présentation personnelle ─ */}
+            {isP0Feedback && pb?.criteria?.length > 0 && (
+              <div style={{ marginBottom: "1.5rem" }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12 }}>Les 5 points obligatoires</div>
+                {pb.criteria.map((c, i) => (
+                  <div key={i} style={{ background: C.bg, borderRadius: 16, border: `1.5px solid ${c.color}`, marginBottom: 14, overflow: "hidden" }}>
+                    <div style={{ background: c.bg, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ background: c.color, color: "#fff", borderRadius: "50%", width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{i+1}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.text, flex: 1 }}>{c.label}</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: c.color, background: "#fff", borderRadius: 20, padding: "2px 10px", border: `1px solid ${c.color}`, flexShrink: 0, whiteSpace: "nowrap" }}>{c.level || "—"}</span>
+                    </div>
+                    <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+                      {c.bien && c.bien.length > 5 && (
+                        <div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: C.success, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>✓ Ce qui était bien</div>
+                          <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, background: C.successLight, borderRadius: 10, padding: "8px 12px" }}>{c.bien}</div>
+                        </div>
+                      )}
+                      {c.manque && c.manque.length > 5 && (
+                        <div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: C.danger, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>✕ Ce qui manquait</div>
+                          <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, background: C.dangerLight, borderRadius: 10, padding: "8px 12px" }}>{c.manque}</div>
+                        </div>
+                      )}
+                      {c.exemple && c.exemple.length > 5 && (
+                        <div>
+                          <div style={{ fontSize: 10, fontWeight: 700, color: C.purple, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>💡 Ce qu'il fallait dire</div>
+                          <div style={{ fontSize: 13, fontStyle: "italic", color: C.purpleDark, lineHeight: 1.6, background: C.purpleLight, borderRadius: 10, padding: "8px 12px" }}>"{c.exemple}"</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {pb.oral && (
+                  <div style={{ background: C.bg, borderRadius: 16, border: `1.5px solid ${getLevelColor(pb.oral.level)}`, overflow: "hidden", marginBottom: 14 }}>
+                    <div style={{ background: getLevelBg(pb.oral.level), padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontSize: 16 }}>🗣️</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: C.text, flex: 1 }}>Expression orale</span>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: getLevelColor(pb.oral.level), background: "#fff", borderRadius: 20, padding: "2px 10px", border: `1px solid ${getLevelColor(pb.oral.level)}`, flexShrink: 0 }}>{pb.oral.level || "—"}</span>
+                    </div>
+                    {pb.oral.comment && <div style={{ padding: "12px 14px", fontSize: 13, color: C.text, lineHeight: 1.6 }}>{pb.oral.comment}</div>}
+                  </div>
+                )}
+                {pb?.recommandations?.length > 0 && (
+                  <div style={{ background: C.purpleLight, borderRadius: 14, padding: "14px" }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Recommandations prioritaires</div>
+                    {pb.recommandations.map((r, i) => (
+                      <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}>
+                        <span style={{ background: C.grad, color: "#fff", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{i+1}</span>
+                        <span style={{ fontSize: 13, color: C.purpleDark, lineHeight: 1.5 }}>{r}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* ─ SIMULATION : grille officielle ─ */}
             {isSimFeedback && pb?.criteria && (
