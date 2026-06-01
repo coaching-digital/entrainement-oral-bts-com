@@ -726,9 +726,7 @@ export default function App() {
     setParsedBilan(null); setShowExitConfirm(false);
     if (p.id !== "p0") {
       const sys = getSystem(p, cib);
-      const startMsg = p.id === "p1"
-        ? "Commence l'entretien. Tu es en PARTIE 1 — Parcours de professionnalisation. Pose UNIQUEMENT des questions sur les 5 critères de la Partie 1 : C1 Productions réalisées, C2 Contextes et enjeux, C3 Choix créatifs, C4 Parcours de professionnalisation, C5 Regard réflexif. INTERDIT de poser des questions sur la veille, les prestataires, la diffusion ou l'évaluation (ces thèmes appartiennent à la Partie 2). Commence par un critère au hasard parmi les 5 de la Partie 1."
-        : "Commence l'entretien. Tu es en PARTIE 2 — Dossier projets. Pose UNIQUEMENT des questions sur les 5 compétences de la Partie 2 : C1 Veille créative et technologique, C2 Création de contenus, C3 Production et diffusion, C4 Achat de prestations, C5 Contrôle et évaluation. INTERDIT de poser des questions sur les productions du portfolio, les choix créatifs ou le parcours personnel (ces thèmes appartiennent à la Partie 1). Commence par une compétence au hasard parmi les 5 de la Partie 2.";
+      const startMsg = "Pose ta première question maintenant. Sans introduction, sans présentation, sans expliquer ce que tu vas faire. Sans mentionner le critère évalué. Juste la question, directement.";
       const first = await callAI([{ role: "user", content: startMsg }], sys);
       setMessages([{ role: "assistant", content: first }]);
       speak(first);
