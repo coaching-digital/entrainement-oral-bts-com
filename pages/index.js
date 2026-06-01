@@ -1121,7 +1121,13 @@ export default function App() {
             width: calc(100% / 1.45);
             margin-left: calc((100% - 100% / 1.45) / 2);
           }
-          .session-container { max-width: 100%; }
+          .session-container {
+            transform-origin: top center;
+            transform: scale(1.45);
+            width: calc(100% / 1.45);
+            margin-left: calc((100% - 100% / 1.45) / 2);
+            height: calc(100vh / 1.45);
+          }
           /* Grille 3 colonnes pour les 3 parties */
           .phases-grid { display:grid !important; grid-template-columns:repeat(3,1fr); gap:16px; }
           .phases-grid > button { flex-direction:column !important; align-items:flex-start !important; padding:20px !important; margin-bottom:0 !important; }
