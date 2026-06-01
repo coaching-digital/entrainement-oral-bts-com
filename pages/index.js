@@ -569,6 +569,115 @@ const AppreciationBadge = ({ level }) => {
   );
 };
 
+// ─── HISTORY DETAIL ──────────────────────────────────────────────────────────
+
+const HistoryDetail = ({ session, onClose, getLevelColor, getLevelBg, C }) => {
+  const pb = session.parsedBilan;
+  const isSimFeedback = pb?.type === "simulation";
+  const msgs = session.messages || [];
+
+  return (
+    <div>
+      {/* Bouton retour */}
+      <button onClick={onClose} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", fontSize: 13, color: C.purple, cursor: "pointer", fontWeight: 600, marginBottom: 14, padding: 0 }}>
+        ← Retour à l'historique
+      </button>
+
+      {/* Hero mini */}
+      <div style={{ background: "linear-gradient(135deg, #7C3AED 0%, #DB2777 100%)", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.7)", marginBottom: 3, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          {isSimFeedback ? "Simulation" : "Entraînement"} · {session.date}
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
+          {session.phase}{session.ciblé ? ` · ${session.ciblé}` : ""}
+        </div>
+        {pb?.note != null && (
+          <div style={{ display: "inline-flex", alignItems: "baseline", gap: 4, background: "rgba(255,255,255,0.2)", borderRadius: 10, padding: "4px 12px" }}>
+            <span style={{ fontSize: 22, fontWeight: 800, color: "#fff" }}>{pb.note}</span>
+            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)" }}>/10</span>
+          </div>
+        )}
+        {pb?.appreciation && (
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,0.2)", borderRadius: 10, padding: "4px 12px" }}>
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{pb.appreciation}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Critères */}
+      {pb?.criteria?.length > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          {pb.criteria.map((c, i) => (
+            <div key={i} style={{ background: "#fff", borderRadius: 14, border: `1.5px solid ${c.color}`, marginBottom: 10, overflow: "hidden" }}>
+              <div style={{ background: c.bg, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ background: c.color, color: "#fff", borderRadius: "50%", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{c.key}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: C.text, flex: 1 }}>{c.label}</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: c.color, background: "#fff", borderRadius: 20, padding: "2px 10px", border: `1px solid ${c.color}`, flexShrink: 0, whiteSpace: "nowrap" }}>{c.level || "—"}</span>
+              </div>
+              <div style={{ padding: "10px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+                {c.bien && c.bien.length > 5 && (
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: C.success, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>✓ Ce qui était bien</div>
+                    <div style={{ fontSize: 12, color: C.text, lineHeight: 1.6, background: C.successLight, borderRadius: 8, padding: "8px 10px" }}>{c.bien}</div>
+                  </div>
+                )}
+                {c.manque && c.manque.length > 5 && (
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: C.danger, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>✕ Ce qui manquait</div>
+                    <div style={{ fontSize: 12, color: C.text, lineHeight: 1.6, background: C.dangerLight, borderRadius: 8, padding: "8px 10px" }}>{c.manque}</div>
+                  </div>
+                )}
+                {c.exemple && c.exemple.length > 5 && (
+                  <div>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: C.purple, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>💡 Ce qu'il fallait dire</div>
+                    <div style={{ fontSize: 12, fontStyle: "italic", color: C.purpleDark, lineHeight: 1.6, background: C.purpleLight, borderRadius: 8, padding: "8px 10px" }}>"{c.exemple}"</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Expression orale */}
+      {pb?.oral && (
+        <div style={{ background: "#fff", borderRadius: 14, border: `1.5px solid ${getLevelColor(pb.oral.level)}`, marginBottom: 16, overflow: "hidden" }}>
+          <div style={{ background: getLevelBg(pb.oral.level), padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 16 }}>🗣️</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: C.text, flex: 1 }}>Expression orale</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: getLevelColor(pb.oral.level), background: "#fff", borderRadius: 20, padding: "2px 10px", border: `1px solid ${getLevelColor(pb.oral.level)}`, flexShrink: 0 }}>{pb.oral.level || "—"}</span>
+          </div>
+          {pb.oral.comment && <div style={{ padding: "10px 14px", fontSize: 12, color: C.text, lineHeight: 1.6 }}>{pb.oral.comment}</div>}
+        </div>
+      )}
+
+      {/* Recommandations */}
+      {pb?.recommandations?.length > 0 && (
+        <div style={{ background: C.purpleLight, borderRadius: 14, padding: "14px", marginBottom: 16 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: C.textSub, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>Recommandations</div>
+          {pb.recommandations.map((r, i) => (
+            <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8, alignItems: "flex-start" }}>
+              <span style={{ background: "linear-gradient(135deg,#7C3AED,#DB2777)", color: "#fff", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>{i+1}</span>
+              <span style={{ fontSize: 13, color: C.purpleDark, lineHeight: 1.5 }}>{r}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Fallback texte brut */}
+      {(!pb || (!pb.criteria?.length && !pb.appreciation)) && session.bilan && (
+        <div style={{ background: C.bg2, borderRadius: 14, padding: "14px", fontSize: 13, lineHeight: 1.8, color: C.text, whiteSpace: "pre-wrap", borderLeft: `4px solid ${C.purple}`, marginBottom: 16 }}>
+          {session.bilan}
+        </div>
+      )}
+
+      <button onClick={onClose} style={{ width: "100%", padding: "12px", borderRadius: 12, border: `1px solid ${C.border}`, background: "#fff", color: C.text, fontWeight: 500, fontSize: 14, cursor: "pointer" }}>
+        ← Retour à l'historique
+      </button>
+    </div>
+  );
+};
+
 // ─── APP ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
@@ -593,6 +702,7 @@ export default function App() {
   const [muted, setMuted] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [parsedBilan, setParsedBilan] = useState(null);
+  const [openSession, setOpenSession] = useState(null); // session historique ouverte
   const [pdfLoading, setPdfLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [showEmailInput, setShowEmailInput] = useState(false);
@@ -655,7 +765,7 @@ export default function App() {
     setParsedBilan(null); setShowExitConfirm(false);
     if (p.id !== "p0") {
       const sys = getSystem(p, cib);
-      const first = await callAI([{ role: "user", content: "Commence l'entretien." }], sys);
+      const first = await callAI([{ role: "user", content: "Commence l'entretien. Varie l'ordre des critères — ne commence pas toujours par C1, choisis un point d'entrée différent à chaque session." }], sys);
       setMessages([{ role: "assistant", content: first }]);
       speak(first);
       setRunning(true);
@@ -736,7 +846,17 @@ export default function App() {
     setMessages(allMsgs);
     const parsed = parseBilan(bilan, phase.id, isSimulation);
     setParsedBilan(parsed);
-    const session = { date: new Date().toLocaleDateString("fr-FR"), phase: phase.label, ciblé: ciblé?.label || null, juryMode, bilan };
+    const session = {
+      date: new Date().toLocaleDateString("fr-FR"),
+      phase: phase.label,
+      phaseId: phase.id,
+      ciblé: ciblé?.label || null,
+      juryMode,
+      bilan,
+      mode,
+      parsedBilan: parsed,
+      messages: allMsgs,
+    };
     await saveSession(session);
     await refreshHistory();
     setScreen("feedback");
@@ -761,7 +881,7 @@ export default function App() {
     setScreen("home"); setMessages([]); setTranscript(""); setRunning(false);
     setTimer(0); setLoading(false); setShowTextInput(false); setTextInput("");
     setCiblé(null); setTab("modes"); setParsedBilan(null); setShowExitConfirm(false);
-    setShowEmailInput(false); setEmailInput(""); setEmailSent(false);
+    setShowEmailInput(false); setEmailInput(""); setEmailSent(false); setOpenSession(null);
   };
 
   const generatePDF = async () => {
@@ -996,7 +1116,16 @@ export default function App() {
 
             {tab === "historique" && (
               <>
-                {histLoading ? (
+                {openSession ? (
+                  // ── Vue détail session historique ──
+                  <HistoryDetail
+                    session={openSession}
+                    onClose={() => setOpenSession(null)}
+                    getLevelColor={getLevelColor}
+                    getLevelBg={getLevelBg}
+                    C={C}
+                  />
+                ) : histLoading ? (
                   <div style={{ textAlign: "center", padding: "2rem 0", color: C.textSub }}>
                     <div style={{ width: 24, height: 24, border: `2px solid ${C.purple}`, borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 12px" }} />
                     Chargement…
@@ -1012,18 +1141,47 @@ export default function App() {
                       <span style={{ fontSize: 13, color: C.textSub }}>{history.length} session{history.length > 1 ? "s" : ""}</span>
                       <button onClick={async () => { await clearHistory(); await refreshHistory(); }} style={{ background: "none", border: "none", fontSize: 12, color: C.danger, cursor: "pointer", textDecoration: "underline" }}>Tout effacer</button>
                     </div>
-                    {history.map((s, i) => (
-                      <div key={i} style={{ background: C.bg2, borderRadius: 14, padding: "14px 16px", marginBottom: 12, borderLeft: `3px solid ${s.juryMode === "sévère" ? C.danger : C.purple}` }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6, gap: 8 }}>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <span style={{ fontSize: 13, fontWeight: 600, color: C.text }}>{s.phase}{s.ciblé ? ` · ${s.ciblé}` : ""}</span>
-                            {s.juryMode === "sévère" && <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, color: C.danger, background: C.dangerLight, borderRadius: 20, padding: "2px 8px" }}>🔥 Sévère</span>}
+                    {history.map((s, i) => {
+                      const pb = s.parsedBilan;
+                      const appLevel = pb?.appreciation || pb?.globalNote != null ? null : null;
+                      const noteVal = pb?.note != null ? pb.note : null;
+                      const appVal = pb?.appreciation || null;
+                      const levelColor = appVal ? getLevelColor(appVal) : noteVal != null ? (noteVal >= 7 ? C.success : noteVal >= 5 ? "#2563EB" : noteVal >= 3 ? C.warn : C.danger) : C.purple;
+                      const levelBg = appVal ? getLevelBg(appVal) : C.bg2;
+                      const levelLabel = appVal || (noteVal != null ? `${noteVal}/10` : null);
+                      return (
+                        <button key={i} onClick={() => setOpenSession(s)} style={{ width: "100%", background: C.bg, borderRadius: 16, padding: "14px 16px", marginBottom: 10, border: `1.5px solid ${C.border}`, cursor: "pointer", textAlign: "left", display: "block" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, marginBottom: 8 }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 2 }}>
+                                {s.phase}{s.ciblé ? ` · ${s.ciblé}` : ""}
+                              </div>
+                              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                                <span style={{ fontSize: 11, color: C.textSub }}>{s.date}</span>
+                                {s.juryMode === "sévère" && <span style={{ fontSize: 10, fontWeight: 700, color: C.danger, background: C.dangerLight, borderRadius: 20, padding: "2px 8px" }}>🔥 Sévère</span>}
+                                {s.mode === "full" && <span style={{ fontSize: 10, fontWeight: 600, color: C.purple, background: C.purpleLight, borderRadius: 20, padding: "2px 8px" }}>Simulation</span>}
+                              </div>
+                            </div>
+                            {/* Badge niveau / note */}
+                            {levelLabel && (
+                              <div style={{ background: levelBg, border: `1.5px solid ${levelColor}`, borderRadius: 12, padding: "6px 12px", textAlign: "center", flexShrink: 0 }}>
+                                <div style={{ fontSize: 15, fontWeight: 800, color: levelColor, lineHeight: 1 }}>{noteVal != null ? noteVal : ""}</div>
+                                <div style={{ fontSize: 10, fontWeight: 600, color: levelColor, whiteSpace: "nowrap" }}>{appVal || "/10"}</div>
+                              </div>
+                            )}
                           </div>
-                          <span style={{ fontSize: 12, color: C.textSub, flexShrink: 0 }}>{s.date}</span>
-                        </div>
-                        <div style={{ fontSize: 12, color: C.textSub, lineHeight: 1.6, whiteSpace: "pre-wrap" }}>{s.bilan?.slice(0, 220)}{s.bilan?.length > 220 ? "…" : ""}</div>
-                      </div>
-                    ))}
+                          {/* Mini barre de progression critères */}
+                          {pb?.criteria?.length > 0 && (
+                            <div style={{ display: "flex", gap: 4, marginTop: 6 }}>
+                              {pb.criteria.map((c, ci) => (
+                                <div key={ci} title={`${c.key}: ${c.level}`} style={{ flex: 1, height: 4, borderRadius: 2, background: c.color || C.border }} />
+                              ))}
+                            </div>
+                          )}
+                          <div style={{ fontSize: 11, color: C.purple, marginTop: 8, fontWeight: 500 }}>Voir le bilan complet →</div>
+                        </button>
+                      );
+                    })}
                   </>
                 )}
               </>
@@ -1198,7 +1356,8 @@ export default function App() {
             ) : null}
           </div>
 
-          <div ref={bilanRef} style={{ padding: "0 1.25rem", background: "#ffffff" }}>
+          <div style={{ padding: "0 1.25rem" }}>
+            <div ref={bilanRef} style={{ background: "#ffffff", paddingBottom: 8 }}>
 
             {/* ─ SIMULATION : grille officielle ─ */}
             {isSimFeedback && pb?.criteria && (
@@ -1344,6 +1503,8 @@ export default function App() {
                 </div>
               ))}
             </div>
+
+            </div>{/* fin bilanRef */}
 
             {/* Actions */}
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: "1.25rem", marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: 10 }}>
