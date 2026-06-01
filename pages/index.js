@@ -591,6 +591,11 @@ export default function App() {
   const [muted, setMuted] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
   const [parsedBilan, setParsedBilan] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [showEmailInput, setShowEmailInput] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+  const bilanRef = useRef(null);
 
   const recognitionRef = useRef(null);
   const monoRef = useRef(""); // Accumule le monologue P0 hors state React
@@ -754,6 +759,79 @@ export default function App() {
     setScreen("home"); setMessages([]); setTranscript(""); setRunning(false);
     setTimer(0); setLoading(false); setShowTextInput(false); setTextInput("");
     setCiblé(null); setTab("modes"); setParsedBilan(null); setShowExitConfirm(false);
+    setShowEmailInput(false); setEmailInput(""); setEmailSent(false);
+  };
+
+  const generatePDF = async () => {
+    if (!bilanRef.current) return;
+    setPdfLoading(true);
+    try {
+      const { default: html2canvas } = await import("html2canvas");
+      const { jsPDF } = await import("jspdf");
+      const element = bilanRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+      });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth - 20;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 10;
+      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight - 20;
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight + 10;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight - 20;
+      }
+      const date = new Date().toLocaleDateString("fr-FR").replace(/\//g, "-");
+      const phaseName = phase.label.replace(/ /g, "_");
+      pdf.save(\`BTS_Com_Bilan_\${phaseName}_\${date}.pdf\`);
+    } catch (e) {
+      console.error("PDF error:", e);
+      alert("Erreur lors de la génération du PDF. Essayez depuis un navigateur.");
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
+  const sendByEmail = () => {
+    const pb = parsedBilan;
+    const date = new Date().toLocaleDateString("fr-FR");
+    const phaseName = phase.label;
+    let body = \`Bilan d'entraînement BTS Communication — E6 Bloc 2\n\`;
+    body += \`\${phaseName} · \${date}\n\`;
+    body += \`\n\`;
+    if (pb?.appreciation) body += \`Appréciation globale : \${pb.appreciation}\n\n\`;
+    if (pb?.note != null) body += \`Note : \${pb.note}/10\n\n\`;
+    if (pb?.criteria?.length) {
+      pb.criteria.forEach(c => {
+        body += \`--- \${c.key} : \${c.label} ---\n\`;
+        body += \`Niveau : \${c.level || "—"}\n\`;
+        if (c.bien) body += \`Points positifs : \${c.bien}\n\`;
+        if (c.manque) body += \`À améliorer : \${c.manque}\n\`;
+        if (c.exemple) body += \`Exemple : \${c.exemple}\n\`;
+        body += \`\n\`;
+      });
+    }
+    if (pb?.recommandations?.length) {
+      body += \`Recommandations :\n\`;
+      pb.recommandations.forEach((r, i) => { body += \`\${i+1}. \${r}\n\`; });
+    }
+    body += \`\nGénéré par entrainement-oral-bts-com.vercel.app\`;
+    const subject = encodeURIComponent(\`Bilan BTS Com — \${phaseName} — \${date}\`);
+    const bodyEncoded = encodeURIComponent(body);
+    const email = emailInput.trim();
+    window.location.href = \`mailto:\${email}?subject=\${subject}&body=\${bodyEncoded}\`;
+    setEmailSent(true);
+    setShowEmailInput(false);
   };
 
   const timerWarn = timer < 120;
@@ -1118,7 +1196,7 @@ export default function App() {
             ) : null}
           </div>
 
-          <div style={{ padding: "0 1.25rem" }}>
+          <div ref={bilanRef} style={{ padding: "0 1.25rem", background: "#ffffff" }}>
 
             {/* ─ SIMULATION : grille officielle ─ */}
             {isSimFeedback && pb?.criteria && (
@@ -1266,14 +1344,54 @@ export default function App() {
             </div>
 
             {/* Actions */}
-            {mode === "full" && phaseIdx < PHASES.length - 1 && (
-              <button onClick={goNextPhase} className="btn-primary" style={{ width: "100%", padding: "16px", fontSize: 16, marginBottom: 10 }}>
-                Partie suivante → {PHASES[phaseIdx + 1].icon}
+            <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: "1.25rem", marginTop: "0.5rem", display: "flex", flexDirection: "column", gap: 10 }}>
+
+              {/* Bouton PDF */}
+              <button onClick={generatePDF} disabled={pdfLoading} className="btn-primary" style={{ width: "100%", padding: "14px", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: pdfLoading ? 0.7 : 1 }}>
+                {pdfLoading ? (
+                  <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Génération en cours…</>
+                ) : (
+                  <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Télécharger le PDF</>
+                )}
               </button>
-            )}
-            <button onClick={reset} className="btn-secondary" style={{ width: "100%", padding: "14px", fontSize: 15 }}>
-              ← Retour à l'accueil
-            </button>
+
+              {/* Bouton email */}
+              {!showEmailInput && !emailSent && (
+                <button onClick={() => setShowEmailInput(true)} className="btn-secondary" style={{ width: "100%", padding: "12px", fontSize: 14, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  Recevoir par email
+                </button>
+              )}
+
+              {/* Saisie email */}
+              {showEmailInput && (
+                <div style={{ background: C.bg2, borderRadius: 14, padding: "14px", border: `1px solid ${C.border}` }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 8 }}>Envoyer le bilan à :</div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input type="email" value={emailInput} onChange={e => setEmailInput(e.target.value)} placeholder="ton@email.fr" style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: `1.5px solid ${C.border}`, fontSize: 14, background: C.bg, color: C.text, fontFamily: "inherit" }} />
+                    <button onClick={sendByEmail} disabled={!emailInput.trim()} style={{ padding: "10px 16px", borderRadius: 10, border: "none", background: emailInput.trim() ? C.grad : C.bg2, color: emailInput.trim() ? "#fff" : C.textSub, fontWeight: 600, cursor: "pointer", fontSize: 14 }}>→</button>
+                  </div>
+                  <div style={{ fontSize: 12, color: C.textSub, marginTop: 6 }}>Ouvre ton application mail avec le bilan pré-rempli.</div>
+                  <button onClick={() => setShowEmailInput(false)} style={{ background: "none", border: "none", fontSize: 12, color: C.textSub, cursor: "pointer", textDecoration: "underline", marginTop: 4 }}>Annuler</button>
+                </div>
+              )}
+
+              {emailSent && (
+                <div style={{ background: C.successLight, borderRadius: 12, padding: "10px 14px", fontSize: 13, color: C.success, textAlign: "center" }}>
+                  ✓ Email préparé — vérifie ton application mail !
+                </div>
+              )}
+
+              {mode === "full" && phaseIdx < PHASES.length - 1 && (
+                <button onClick={goNextPhase} className="btn-primary" style={{ width: "100%", padding: "14px", fontSize: 15 }}>
+                  Partie suivante → {PHASES[phaseIdx + 1].icon}
+                </button>
+              )}
+
+              <button onClick={reset} className="btn-secondary" style={{ width: "100%", padding: "14px", fontSize: 15 }}>
+                ← Retour à l'accueil
+              </button>
+            </div>
           </div>
         </div>
         );
