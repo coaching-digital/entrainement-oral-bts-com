@@ -1113,38 +1113,42 @@ export default function App() {
         /* ── DESKTOP (≥1024px) ── */
         @media (min-width: 1024px) {
           .page-container { max-width: 100%; padding: 0; }
-          .session-container { max-width: 100%; height: 100vh; }
-          /* Hero plus grand */
-          .home-hero { padding: 3rem 8vw 2.5rem !important; }
-          .home-hero h1 { font-size: 42px !important; }
-          .home-hero p { font-size: 18px !important; }
-          /* Tabs */
+          .session-container { max-width: 100%; }
+
+          /* ── HOME uniquement ── */
+          .home-hero { padding: 4rem 8vw 3.5rem !important; }
+          .home-hero h1 { font-size: 52px !important; line-height: 1.1; }
+          .home-hero p { font-size: 20px !important; line-height: 1.6; }
+          .home-hero > div > div:last-child span { font-size: 15px !important; padding: 6px 18px !important; }
           .home-tabs { padding: 10px 8vw !important; }
-          .tab-btn { font-size: 16px !important; padding: 12px 8px !important; }
-          /* Contenu home */
-          .home-content { padding: 2rem 8vw 3rem !important; font-size: 16px; }
-          .home-content div, .home-content span, .home-content button { font-size: 16px; }
-          /* Session */
-          .session-header { padding: 1.25rem 6vw !important; }
-          .timer-display { font-size: 42px !important; }
-          .msg-area { padding: 1.5rem 6vw !important; }
-          .msg-jury, .msg-cand { font-size: 17px !important; max-width: 75%; line-height: 1.8; }
-          .controls-area { padding: 1rem 6vw 1.25rem !important; }
-          .mic-btn { width: 80px !important; height: 80px !important; }
-          /* Feedback */
-          .feedback-hero { padding: 2.5rem 8vw !important; }
-          .feedback-content { padding: 0 8vw 2rem !important; font-size: 16px; }
+          .tab-btn { font-size: 17px !important; padding: 14px 8px !important; }
+          .home-content { padding: 2.5rem 8vw 3rem !important; }
+
+          /* Texte des éléments home */
+          .home-content > div { font-size: 16px; }
+          .home-content button > div > div:first-child { font-size: 16px !important; }
+          .home-content button > div > div:last-child { font-size: 14px !important; }
+
+          /* Simulation complète */
+          .sim-btn { padding: 26px 28px !important; }
+          .sim-btn > span:first-child { font-size: 38px !important; }
+
           /* Grille 3 colonnes pour les 3 parties */
-          .phases-grid { display:grid !important; grid-template-columns:repeat(3,1fr); gap:16px; }
-          .phases-grid > button { flex-direction:column !important; align-items:flex-start !important; padding:22px !important; margin-bottom:0 !important; }
-          .phases-grid > button > span:first-child { font-size:30px !important; margin-bottom:10px; }
-          .phases-grid .phase-label { font-size:17px !important; }
-          .phases-grid .phase-sub { font-size:15px !important; }
-          .phases-grid .phase-time { font-size:15px !important; align-self:flex-end; margin-top:8px; }
+          .phases-grid { display:grid !important; grid-template-columns:repeat(3,1fr); gap:20px; }
+          .phases-grid > button { flex-direction:column !important; align-items:flex-start !important; padding:28px !important; margin-bottom:0 !important; }
+          .phases-grid > button > span:first-child { font-size:36px !important; margin-bottom:14px; }
+          .phases-grid .phase-label { font-size:18px !important; }
+          .phases-grid .phase-sub { font-size:15px !important; margin-top: 4px !important; }
+          .phases-grid .phase-time { font-size:15px !important; align-self:flex-end; margin-top:16px; }
+
           /* Grille 2 colonnes pour les critères */
           .criteria-grid { display:grid !important; grid-template-columns:1fr 1fr; gap:12px; }
-          .criteria-grid > * { margin-bottom:0 !important; font-size:15px !important; }
-          .sim-btn { padding: 22px 24px !important; }
+          .criteria-grid > * { margin-bottom:0 !important; padding: 14px 16px !important; }
+          .criteria-grid > * span:last-child { font-size:14px !important; }
+
+          /* Feedback */
+          .feedback-hero { padding: 3rem 8vw !important; }
+          .feedback-content { padding: 0 8vw 2rem !important; }
         }
 
         /* Utilitaires responsive */
