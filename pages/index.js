@@ -419,6 +419,13 @@ const CRITERIA_LABELS_P2 = {
 
 function getLevelColor(level) { return LEVEL_COLORS[level] || C.purple; }
 function getLevelBg(level) { return LEVEL_BG[level] || C.purpleLight; }
+// Filtre les "bien" vides ou négatifs générés par l'IA
+function hasBien(text) {
+  if (!text || text.length < 5) return false;
+  const negatives = ["aucun", "rien", "néant", "pas de", "pas d'", "nothing", "none", "aucune", "n'a pas", "n'a rien", "absent", "manque"];
+  const lower = text.toLowerCase();
+  return !negatives.some(n => lower.startsWith(n) || lower.includes(n + " ") );
+}
 
 function parseBilan(text, phaseId, isSimulation) {
   if (!text) return null;
@@ -665,7 +672,7 @@ const HistoryDetail = ({ session, onClose, getLevelColor, getLevelBg, C }) => {
                 <span style={{ fontSize: 11, fontWeight: 700, color: c.color, background: "#fff", borderRadius: 20, padding: "2px 10px", border: `1px solid ${c.color}`, flexShrink: 0, whiteSpace: "nowrap" }}>{c.level || "—"}</span>
               </div>
               <div style={{ padding: "10px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
-                {c.bien && c.bien.length > 5 && (
+                {hasBien(c.bien) && (
                   <div>
                     <div style={{ fontSize: 10, fontWeight: 700, color: C.success, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>✓ Ce qui était bien</div>
                     <div style={{ fontSize: 12, color: C.text, lineHeight: 1.6, background: C.successLight, borderRadius: 8, padding: "8px 10px" }}>{c.bien}</div>
@@ -1539,7 +1546,7 @@ export default function App() {
                       <span style={{ fontSize: 11, fontWeight: 700, color: c.color, background: "#fff", borderRadius: 20, padding: "2px 10px", border: `1px solid ${c.color}`, flexShrink: 0, whiteSpace: "nowrap" }}>{c.level || "—"}</span>
                     </div>
                     <div style={{ padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
-                      {c.bien && c.bien.length > 5 && (
+                      {hasBien(c.bien) && (
                         <div>
                           <div style={{ fontSize: 10, fontWeight: 700, color: C.success, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 4 }}>✓ Ce qui était bien</div>
                           <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, background: C.successLight, borderRadius: 10, padding: "8px 12px" }}>{c.bien}</div>
@@ -1624,7 +1631,7 @@ export default function App() {
                     </div>
                     <div style={{ padding: "12px 14px" }}>
                       {/* Points positifs */}
-                      {c.bien && c.bien !== "Aucun point positif identifié" && c.bien.length > 5 && (
+                      {hasBien(c.bien) && (
                         <div style={{ marginBottom: 10 }}>
                           <div style={{ fontSize: 11, fontWeight: 700, color: C.success, textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 5 }}>✓ Ce qui était bien</div>
                           <div style={{ fontSize: 13, color: C.text, lineHeight: 1.6, background: C.successLight, borderRadius: 10, padding: "8px 12px" }}>{c.bien}</div>
