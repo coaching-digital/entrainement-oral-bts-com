@@ -1112,35 +1112,20 @@ export default function App() {
         }
         /* ── DESKTOP (≥1024px) ── */
         @media (min-width: 1024px) {
-          html { font-size: 17px; }
+          body { zoom: 1.45; }
           .page-container { max-width: 100%; padding: 0; }
           .session-container { max-width: 100%; }
-          .home-hero { padding:3rem 8vw 2.5rem; border-radius:0; }
-          .home-hero h1 { font-size:42px !important; line-height:1.15; }
-          .home-hero p { font-size:17px !important; }
-          .home-tabs { padding:10px 8vw; gap:8px; }
-          .tab-btn { font-size:15px; padding:12px 8px; }
-          .home-content { padding:2rem 8vw 3rem; }
-          .session-header { padding:1.25rem 8vw; border-radius:0; }
-          .timer-display { font-size:40px; }
-          .msg-area { padding:1.5rem 8vw; }
-          .controls-area { padding:1.25rem 8vw 1.5rem; }
-          .feedback-hero { padding:3rem 8vw; border-radius:0; }
-          .feedback-content { padding:0 8vw 2rem; }
-          .msg-jury, .msg-cand { font-size:16px; max-width:72%; line-height:1.8; }
-          .mic-btn { width:88px; height:88px; }
+          .home-tabs { padding:8px 6px; }
           /* Grille 3 colonnes pour les 3 parties */
           .phases-grid { display:grid !important; grid-template-columns:repeat(3,1fr); gap:16px; }
-          .phases-grid > button { flex-direction:column !important; align-items:flex-start !important; padding:22px !important; margin-bottom:0 !important; }
-          .phases-grid > button > span:first-child { font-size:30px !important; margin-bottom:10px; }
-          .phases-grid .phase-label { font-size:16px !important; }
-          .phases-grid .phase-sub { font-size:14px !important; }
-          .phases-grid .phase-time { font-size:14px !important; align-self:flex-end; margin-top:8px; }
+          .phases-grid > button { flex-direction:column !important; align-items:flex-start !important; padding:20px !important; margin-bottom:0 !important; }
+          .phases-grid > button > span:first-child { font-size:28px !important; margin-bottom:8px; }
+          .phases-grid .phase-label { font-size:15px !important; }
+          .phases-grid .phase-sub { font-size:13px !important; }
+          .phases-grid .phase-time { font-size:13px !important; align-self:flex-end; margin-top:8px; }
           /* Grille 2 colonnes pour les critères */
-          .criteria-grid { display:grid !important; grid-template-columns:1fr 1fr; gap:12px; }
-          .criteria-grid > * { margin-bottom:0 !important; font-size:15px !important; }
-          /* Simulation complète */
-          .sim-btn { padding:24px 28px !important; }
+          .criteria-grid { display:grid !important; grid-template-columns:1fr 1fr; gap:10px; }
+          .criteria-grid > * { margin-bottom:0 !important; }
         }
 
         /* Utilitaires responsive */
