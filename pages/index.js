@@ -874,43 +874,24 @@ export default function App() {
   const endPhase = async () => {
     setRunning(false); stopTTS();
     recognitionRef.current?.stop(); setRecording(false);
+    setTranscript("");
+
+    let feedbackMsgs;
+    let isSimulation = mode === "full";
 
     if (phase.id === "p0") {
       const mono = monoRef.current.trim();
-      // Basculer immédiatement vers feedback avec état chargement
-      setScreen("feedback");
-      setParsedBilan(null);
-      if (!mono) return;
-      // Appel IA en arrière-plan
-      const feedbackMsgs = [{ role: "user", content: "Voici la présentation personnelle du candidat à l'oral du BTS Communication E6 Bloc 2 : \"" + mono + "\". BILAN" }];
-      const sys = SYSTEM_P0;
-      const bilan = await callAI(feedbackMsgs, sys);
-      const parsed = parseBilan(bilan, "p0", false);
-      setParsedBilan(parsed);
-      const allMsgs = [{ role: "assistant", content: bilan }];
-      setMessages(allMsgs);
-      const session = {
-        date: new Date().toLocaleDateString("fr-FR"),
-        phase: phase.label,
-        phaseId: "p0",
-        ciblé: null,
-        juryMode,
-        bilan,
-        mode,
-        parsedBilan: parsed,
-        messages: allMsgs,
-      };
-      await saveSession(session);
-      await refreshHistory();
-      return;
+      if (!mono) { setScreen("feedback"); return; }
+      feedbackMsgs = [{ role: "user", content: "Voici la présentation personnelle du candidat à l'oral du BTS Communication E6 Bloc 2 : \"" + mono + "\". BILAN" }];
+    } else {
+      feedbackMsgs = [...messages, { role: "user", content: "BILAN" }];
     }
 
-    // P1 / P2
-    const feedbackMsgs = [...messages, { role: "user", content: "BILAN" }];
-    const isSimulation = mode === "full";
-    const sys = getSystem(phase, ciblé, isSimulation);
+    const sys = phase.id === "p0" ? SYSTEM_P0 : getSystem(phase, ciblé, isSimulation);
     const bilan = await callAI(feedbackMsgs, sys);
-    const allMsgs = [...messages, { role: "assistant", content: bilan }];
+    const allMsgs = phase.id === "p0"
+      ? [{ role: "assistant", content: bilan }]
+      : [...messages, { role: "assistant", content: bilan }];
     setMessages(allMsgs);
     const parsed = parseBilan(bilan, phase.id, isSimulation);
     setParsedBilan(parsed);
@@ -1430,22 +1411,20 @@ export default function App() {
                         <span style={{ fontSize: 9, fontWeight: 700, color: C.purple }}>PARLER</span>
                       </button>
                       {phase.id === "p0" && (
-                        <button onClick={endPhase} disabled={loading} className="btn-primary" style={{ padding: "14px 22px", fontSize: 14, opacity: loading ? 0.5 : 1 }}>
-                          Terminer →
+                        <button onClick={endPhase} disabled={loading} className="btn-primary" style={{ padding: "14px 22px", fontSize: 14, opacity: loading ? 0.5 : 1, display: "flex", alignItems: "center", gap: 8 }}>
+                          {loading ? <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Analyse…</> : "Terminer →"}
                         </button>
                       )}
                     </>
                   ) : (
                     <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-                      {/* En P0 : arrêter le micro = "Continuer" (accumule sans envoyer à l'IA) */}
                       <button onClick={stopAndSend} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.pink}`, background: C.pinkLight, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, animation: "pulse 1.2s infinite", flexShrink: 0 }}>
                         <svg width="22" height="22" viewBox="0 0 24 24" fill={C.pink}><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: C.pink }}>{phase.id === "p0" ? "PAUSE" : "ENVOYER"}</span>
+                        <span style={{ fontSize: 9, fontWeight: 700, color: C.pink }}>PAUSE</span>
                       </button>
-                      {/* Toujours accessible en P0 même pendant l'enregistrement */}
                       {phase.id === "p0" && (
-                        <button onClick={endPhase} disabled={loading} className="btn-primary" style={{ padding: "14px 22px", fontSize: 14, opacity: loading ? 0.5 : 1 }}>
-                          Terminer →
+                        <button onClick={endPhase} disabled={loading} className="btn-primary" style={{ padding: "14px 22px", fontSize: 14, opacity: loading ? 0.5 : 1, display: "flex", alignItems: "center", gap: 8 }}>
+                          {loading ? <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Analyse…</> : "Terminer →"}
                         </button>
                       )}
                     </div>
@@ -1481,7 +1460,6 @@ export default function App() {
         const pb = parsedBilan;
         const isSimFeedback = pb?.type === "simulation";
         const isP0Feedback = pb?.type === "p0";
-        const isLoadingP0 = phase.id === "p0" && !pb && loading;
         const noteColor = pb?.note >= 6 ? (pb?.note >= 8 ? C.success : "#2563EB") : C.danger;
         return (
         <div className="page-container">
@@ -1503,23 +1481,12 @@ export default function App() {
               </div>
             ) : pb?.appreciation ? (
               <AppreciationBadge level={pb.appreciation} />
-            ) : isLoadingP0 ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.2)", borderRadius: 12, padding: "8px 14px", width: "fit-content" }}>
-                <div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
-                <span style={{ fontSize: 13, color: "#fff" }}>Analyse en cours…</span>
-              </div>
+
             ) : null}
           </div>
 
           <div className="feedback-content">
-            {/* Spinner P0 chargement */}
-            {isLoadingP0 && (
-              <div style={{ textAlign: "center", padding: "3rem 0", color: C.textSub }}>
-                <div style={{ width: 32, height: 32, border: `3px solid ${C.purpleLight}`, borderTopColor: C.purple, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
-                <div style={{ fontSize: 14, fontWeight: 500 }}>Le jury analyse votre présentation…</div>
-                <div style={{ fontSize: 12, marginTop: 6 }}>Évaluation des 5 points obligatoires</div>
-              </div>
-            )}
+
             <div ref={bilanRef} style={{ background: "#ffffff", paddingBottom: 8 }}>
 
             {/* ─ P0 : présentation personnelle ─ */}
