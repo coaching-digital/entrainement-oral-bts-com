@@ -122,153 +122,59 @@ EXPRESSION_ORALE: [niveau] | [commentaire détaillé : tics de langage ("euh", "
 RECOMMANDATIONS: [3-5 axes prioritaires séparés par des points-virgules]
 PAS de note chiffrée pour la présentation personnelle.`;
 
-const makeSystemP1 = (ciblé=null, sévère=false, isSimulation=false) => `Tu es un jury de BTS Communication — Partie 1 : Parcours de professionnalisation (15 min).
-Grille officielle BTS Com E6 Bloc 2 — Partie 1 (note /10) :
-- C1 : Pertinence, efficacité et diversité des productions réalisées
-- C2 : Capacité à expliciter les productions, leurs contextes et leurs enjeux
-- C3 : Capacité à justifier les choix créatifs effectués
-- C4 : Capacité à expliciter le parcours de professionnalisation
-- C5 : Regard réflexif sur les compétences acquises et capacité de transfert
+const QUESTIONS_P1 = {
+  C1: { label: "Pertinence, efficacit\u00e9 et diversit\u00e9 des productions r\u00e9alis\u00e9es",
+    classiques: ["Quels types de productions avez-vous r\u00e9alis\u00e9es au cours de votre formation ?","Quelle est, selon vous, votre production la plus aboutie dans ce portfolio ? Pourquoi ?","Avez-vous travaill\u00e9 sur des supports vari\u00e9s \u2014 print, digital, audiovisuel ? Lesquels ?","Comment avez-vous s\u00e9lectionn\u00e9 les productions \u00e0 int\u00e9grer dans votre portfolio ?","Quelle production vous a demand\u00e9 le plus de travail et pourquoi ?","Y a-t-il une production dont vous n\u2019\u00eates pas pleinement satisfait ? Laquelle et pour quelle raison ?","Comment avez-vous fait \u00e9voluer vos productions au fil de la formation ?","Quels outils avez-vous utilis\u00e9s pour r\u00e9aliser vos productions ?","Avez-vous r\u00e9alis\u00e9 des productions seul ou en \u00e9quipe ? Quelle diff\u00e9rence cela fait-il ?","Comment avez-vous mesur\u00e9 ou \u00e9valu\u00e9 l\u2019efficacit\u00e9 d\u2019une de vos productions ?"],
+    exigeantes: ["Parmi vos productions, laquelle a eu le plus d\u2019impact mesurable sur l\u2019objectif vis\u00e9 ? Comment le prouvez-vous ?","En quoi la diversit\u00e9 de vos productions refl\u00e8te-t-elle une ma\u00eetrise des registres de communication, et non une simple accumulation de travaux ?","Si un commanditaire vous demandait de refaire cette production avec la moiti\u00e9 du temps, que sacrifieriez-vous en premier et pourquoi ?","Comment distinguez-vous une production techniquement r\u00eaussie d\u2019une production r\u00e9ellement efficace en communication ?","Quelle production de votre portfolio serait la moins adapt\u00e9e si la cible avait chang\u00e9 ? Pourquoi ?","Citez une production pertinente qui n\u2019a pas atteint son objectif. Comment l\u2019expliquez-vous ?","Comment avez-vous arbitr\u00e9 entre contraintes cr\u00e9atives et contraintes de production dans vos r\u00e9alisations complexes ?","En quoi vos productions en entreprise se distinguent-elles de celles en formation ? Qu\u2019est-ce que cela r\u00e9v\u00e8le ?","Si vous deviez retirer une production pour am\u00e9liorer la coh\u00e9rence globale de votre portfolio, laquelle et pourquoi ?","Quelle comp\u00e9tence technique vos productions attestent-elles que vous ma\u00eetrisez aujourd\u2019hui, et que vous n\u2019aviez pas au d\u00e9part ?"] },
+  C2: { label: "Capacit\u00e9 \u00e0 expliciter les productions, leurs contextes et leurs enjeux",
+    classiques: ["Pouvez-vous nous pr\u00e9senter le contexte dans lequel cette production a \u00e9t\u00e9 r\u00e9alis\u00e9e ?","Quel \u00e9tait le brief ou la demande initiale pour ce projet ?","\u00c0 quelle cible s\u2019adressait cette production et quelles \u00e9taient ses caract\u00e9ristiques ?","Quel \u00e9tait le message principal que vous deviez faire passer ?","Quelles contraintes avez-vous d\u00fb prendre en compte : budget, d\u00e9lai, image de marque ?","Qui \u00e9tait le commanditaire et quel r\u00f4le a-t-il jou\u00e9 dans la d\u00e9finition du projet ?","Comment avez-vous analys\u00e9 les besoins du commanditaire avant de commencer ?","Quels \u00e9taient les supports et canaux de diffusion pr\u00e9vus pour cette production ?","Comment cette production s\u2019inscrivait-elle dans une strat\u00e9gie de communication plus large ?","Y a-t-il eu des ajustements entre le brief initial et la production finale ? Lesquels ?"],
+    exigeantes: ["Quels \u00e9taient les enjeux strat\u00e9giques pour l\u2019organisation derri\u00e8re cette demande ? En quoi votre r\u00e9ponse y r\u00e9pondait-elle pr\u00e9cis\u00e9ment ?","Si le commanditaire vous avait donn\u00e9 un budget deux fois moins important, comment auriez-vous prioris\u00e9 pour pr\u00e9server l\u2019essentiel du message ?","Comment avez-vous identifi\u00e9 ce qui n\u2019\u00e9tait pas dit dans le brief mais pourtant attendu par le commanditaire ?","En quoi le contexte de cette organisation rendait-il la communication particuli\u00e8rement complexe ou sensible ?","Si la cible avait \u00e9t\u00e9 diff\u00e9rente \u2014 plus \u00e2g\u00e9e, moins dipl\u00f4m\u00e9e, \u00e9trang\u00e8re \u2014 comment auriez-vous adapt\u00e9 votre production ?","Quelle part de votre analyse du contexte s\u2019est r\u00e9v\u00e9l\u00e9e inexacte en cours de projet ? Comment l\u2019avez-vous g\u00e9r\u00e9 ?","Comment avez-vous arbitr\u00e9 entre les attentes du commanditaire et ce que vous estimiez \u00eatre la meilleure solution ?","En quoi les enjeux de cette production \u00e9taient-ils diff\u00e9rents d\u2019un projet similaire dans un autre contexte ?","Comment avez-vous \u00e9valu\u00e9 la pertinence de votre analyse du contexte avant de vous lancer dans la cr\u00e9ation ?","Quelle dimension du contexte avez-vous sous-estim\u00e9e et quel impact cela a-t-il eu sur la production finale ?"] },
+  C3: { label: "Capacit\u00e9 \u00e0 justifier les choix cr\u00e9atifs effectu\u00e9s",
+    classiques: ["Pourquoi avoir choisi ce parti pris visuel ou r\u00e9dactionnel pour cette production ?","Quelles autres pistes cr\u00e9atives aviez-vous envisag\u00e9es avant d\u2019arr\u00eater ce choix ?","Comment avez-vous fait valider vos choix cr\u00e9atifs par le commanditaire ?","En quoi votre choix typographique ou colorim\u00e9trique est-il coh\u00e9rent avec l\u2019identit\u00e9 de l\u2019organisation ?","Comment avez-vous articul\u00e9 contraintes cr\u00e9atives et contraintes techniques ?","Quelles r\u00e9f\u00e9rences cr\u00e9atives ou culturelles vous ont inspir\u00e9 pour ce projet ?","Comment avez-vous adapt\u00e9 votre cr\u00e9ativit\u00e9 aux exigences d\u2019une commande professionnelle ?","Y a-t-il un choix cr\u00e9atif que vous avez abandonn\u00e9 en cours de route ? Pour quelle raison ?","Comment avez-vous v\u00e9rifi\u00e9 que vos choix cr\u00e9atifs \u00e9taient adapt\u00e9s \u00e0 la cible ?","Quel retour avez-vous eu sur vos choix cr\u00e9atifs, et en avez-vous tenu compte ?"],
+    exigeantes: ["En quoi votre choix cr\u00e9atif \u00e9tait-il plus pertinent que les autres pistes envisag\u00e9es ? Qu\u2019est-ce qui vous a fait les \u00e9carter ?","Si le commanditaire avait rejet\u00e9 votre proposition, comment l\u2019auriez-vous d\u00e9fendu ou adapt\u00e9 sans trahir la commande ?","Comment diff\u00e9renciez-vous un choix cr\u00e9atif fond\u00e9 sur une analyse rigoureuse d\u2019un choix purement intuitif ?","En quoi vos choix cr\u00e9atifs refl\u00e8tent-ils une culture visuelle ou r\u00e9dactionnelle construite ? Donnez des exemples concrets.","Quel est le choix cr\u00e9atif dont vous \u00eates le plus fier, et pourquoi est-ce pr\u00e9cis\u00e9ment celui-l\u00e0 et pas un autre ?","Comment avez-vous g\u00e9r\u00e9 un d\u00e9saccord cr\u00e9atif avec un commanditaire ou un collaborateur ?","\u00c0 quel moment un choix cr\u00e9atif audacieux vous a-t-il co\u00fbt\u00e9 en validation ou en d\u00e9lai ? Cela valait-il le risque ?","Comment distinguez-vous un choix cr\u00e9atif qui vous ressemble d\u2019un choix qui sert r\u00e9ellement la commande ?","Si vous disposiez d\u2019un budget illimit\u00e9, qu\u2019auriez-vous fait diff\u00e9remment sur le plan cr\u00e9atif pour ce projet ?","Quels choix cr\u00e9atifs avez-vous abandonn\u00e9s pour des raisons techniques ou budg\u00e9taires ? Quel compromis avez-vous trouv\u00e9 ?"] },
+  C4: { label: "Capacit\u00e9 \u00e0 expliciter le parcours de professionnalisation",
+    classiques: ["Comment d\u00e9cririez-vous votre \u00e9volution depuis le d\u00e9but de votre formation ?","Qu\u2019est-ce que votre stage ou alternance vous a apport\u00e9 concr\u00e8tement ?","Quels ont \u00e9t\u00e9 les moments cl\u00e9s de votre professionnalisation ?","Comment les projets en formation ont-ils compl\u00e9t\u00e9 votre exp\u00e9rience en entreprise ?","Y a-t-il une exp\u00e9rience particuli\u00e8rement formatrice dans votre parcours ? Laquelle ?","Comment votre vision du m\u00e9tier de la communication a-t-elle \u00e9volu\u00e9 au fil du parcours ?","Quelles difficult\u00e9s avez-vous rencontr\u00e9es en entreprise et comment les avez-vous surmount\u00e9es ?","Comment avez-vous organis\u00e9 votre mont\u00e9e en comp\u00e9tence tout au long de la formation ?","Quel aspect du m\u00e9tier vous a surpris par rapport \u00e0 ce que vous imaginiez au d\u00e9part ?","Comment avez-vous int\u00e9gr\u00e9 les retours de vos tuteurs ou professeurs dans votre progression ?"],
+    exigeantes: ["Identifiez le moment pr\u00e9cis o\u00f9 vous avez bascul\u00e9 d\u2019une posture d\u2019\u00e9tudiant \u00e0 une posture de professionnel. Pourquoi ce moment-l\u00e0 ?","Quelle a \u00e9t\u00e9 la situation la plus difficile en entreprise, et qu\u2019est-ce qu\u2019elle vous a appris sur votre fa\u00e7on de travailler ?","En quoi votre parcours est-il coh\u00e9rent avec le profil de communicant que vous souhaitez devenir ?","Qu\u2019avez-vous appris en entreprise que la formation ne pouvait pas vous enseigner, et inversement ?","Si vous aviez pu choisir un autre stage, qu\u2019aurait-il apport\u00e9 \u00e0 votre parcours que vous n\u2019avez pas eu ?","Quelle d\u00e9cision professionnelle prise en formation regardez-vous aujourd\u2019hui avec un regard diff\u00e9rent ? Pourquoi ?","Comment avez-vous transform\u00e9 un \u00e9chec ou une erreur en le\u00e7on concr\u00e8te int\u00e9gr\u00e9e \u00e0 votre pratique ?","En quoi votre parcours vous a-t-il conduit \u00e0 remettre en question une conviction sur le m\u00e9tier ?","Quel conseil donneriez-vous \u00e0 un \u00e9tudiant qui commence ce BTS sur ce qu\u2019il faut vraiment apprendre ?","Comment avez-vous construit votre identit\u00e9 professionnelle \u00e0 travers ce parcours ? Qu\u2019est-ce qui la d\u00e9finit aujourd\u2019hui ?"] },
+  C5: { label: "Regard r\u00e9flexif sur les comp\u00e9tences acquises et capacit\u00e9 de transfert",
+    classiques: ["Quelles comp\u00e9tences avez-vous le sentiment d\u2019avoir le mieux d\u00e9velopp\u00e9es ?","Sur quelles comp\u00e9tences avez-vous encore des axes de progression ?","Si vous deviez recommencer ce projet, que feriez-vous diff\u00e9remment ?","Quel regard portez-vous sur vos premi\u00e8res productions compar\u00e9es \u00e0 vos derni\u00e8res ?","Comment \u00e9valuez-vous votre propre travail au quotidien ?","Avez-vous progress\u00e9 de mani\u00e8re homog\u00e8ne ou in\u00e9gale selon les comp\u00e9tences ?","Comment r\u00e9agissez-vous face \u00e0 une critique sur votre travail ?","Quelle comp\u00e9tence d\u00e9velopp\u00e9e en BTS vous semble la plus transf\u00e9rable dans d\u2019autres domaines ?","Comment avez-vous su demander de l\u2019aide lorsque vous \u00e9tiez bloqu\u00e9 sur un projet ?","Qu\u2019est-ce que vous pensez encore ne pas ma\u00eetriser suffisamment \u00e0 ce stade ?"],
+    exigeantes: ["Sur quels crit\u00e8res pr\u00e9cis \u00e9valuez-vous la qualit\u00e9 de votre propre travail, et ont-ils \u00e9volu\u00e9 depuis le d\u00e9but de la formation ?","Face \u00e0 une commande dans un domaine inconnu, quelle serait votre m\u00e9thode pour monter en comp\u00e9tence rapidement ?","Quelle est la comp\u00e9tence que vous avez le plus de mal \u00e0 \u00e9valuer vous-m\u00eame, et comment compensez-vous ce manque de recul ?","Comment distinguez-vous une comp\u00e9tence que vous poss\u00e9dez r\u00e9ellement d\u2019une comp\u00e9tence mobilisable uniquement en contexte guid\u00e9 ?","En quoi votre regard sur votre propre travail diff\u00e8re-t-il de ce qu\u2019un jury ou un commanditaire en dirait ?","Si vous deviez vous attribuer une note sur l\u2019ensemble de ce parcours, laquelle et sur quels \u00e9l\u00e9ments concrets ?","Quelle comp\u00e9tence d\u00e9velopp\u00e9e en BTS estimez-vous transf\u00e9rable dans un secteur totalement diff\u00e9rent de la communication ? Justifiez.","Comment avez-vous fait \u00e9voluer votre mani\u00e8re de travailler face \u00e0 des contraintes nouvelles ou inattendues ?","En quoi votre capacit\u00e9 \u00e0 vous remettre en question a-t-elle \u00e9t\u00e9 un moteur \u2014 ou parfois un frein \u2014 dans votre progression ?","Quelle est la d\u00e9cision dont vous \u00eates le plus fier, et que r\u00e9v\u00e8le-t-elle sur vos valeurs de communicant ?"] }
+};
 
-RÈGLES ABSOLUES :
-- Tu poses UNIQUEMENT des questions. Une seule à la fois. Courte. Directe.
-- INTERDIT : *je note*, *je me penche*, *je souris*, ou toute action narrative.
-- INTERDIT : conseils ou encouragements pendant la session.
-- Demande systématiquement les annexes : "Avez-vous une annexe sur ce point ? Décrivez-la moi."
-- Feedback et conseils UNIQUEMENT sur "BILAN".
+const QUESTIONS_P2 = {
+  C1: { label: "Mettre en oeuvre une veille cr\u00e9ative et technologique au service de la demande",
+    classiques: ["Quelles sources avez-vous utilis\u00e9es pour r\u00e9aliser votre veille cr\u00e9ative et technologique ?","\u00c0 quelle fr\u00e9quence avez-vous effectu\u00e9 cette veille tout au long de votre projet ?","Comment avez-vous s\u00e9lectionn\u00e9 les tendances pertinentes pour votre projet parmi celles identifi\u00e9es ?","Sous quelle forme avez-vous restitu\u00e9 les r\u00e9sultats de votre veille ? Pourquoi ce format ?","Quelles tendances cr\u00e9atives avez-vous identifi\u00e9es et comment ont-elles influenc\u00e9 votre production ?","Avez-vous r\u00e9alis\u00e9 une veille concurrentielle ? Qu\u2019en avez-vous retenu ?","Quels outils num\u00e9riques avez-vous utilis\u00e9s pour organiser et suivre votre veille ?","Comment avez-vous int\u00e9gr\u00e9 les \u00e9volutions technologiques dans vos propositions cr\u00e9atives ?","Avez-vous identifi\u00e9 des tendances qui ne correspondaient pas \u00e0 la demande ? Comment avez-vous tranch\u00e9 ?","Comment avez-vous partag\u00e9 les r\u00e9sultats de votre veille avec le commanditaire ou votre \u00e9quipe ?"],
+    exigeantes: ["En quoi votre veille a-t-elle r\u00e9ellement orient\u00e9 vos choix cr\u00e9atifs, et non simplement servi de justification apr\u00e8s coup ?","Comment distinguez-vous une tendance durable d\u2019un effet de mode ? Donnez un exemple concret sur ce projet.","Quelle tendance identifi\u00e9e avez-vous choisi de ne pas suivre, et pourquoi cette d\u00e9cision \u00e9tait-elle pertinente pour la demande ?","En quoi votre veille technologique a-t-elle modifi\u00e9 votre mani\u00e8re de produire ou de diffuser ce projet ?","Si vous deviez refaire cette veille aujourd\u2019hui, quelles sources ajouteriez-vous et lesquelles abandonneriez-vous ?","Comment avez-vous \u00e9valu\u00e9 la fiabilit\u00e9 et la pertinence des sources consult\u00e9es ?","En quoi la restitution de votre veille \u00e9tait-elle adapt\u00e9e \u00e0 votre interlocuteur ? Aurait-elle \u00e9t\u00e9 diff\u00e9rente pour un autre public ?","Comment avez-vous anticip\u00e9 les \u00e9volutions technologiques susceptibles d\u2019affecter la dur\u00e9e de vie de votre production ?","Quelle veille auriez-vous d\u00fb faire et que vous n\u2019avez pas faite ? Quel impact cela a-t-il eu ?","Comment articulez-vous veille cr\u00e9ative et veille technologique ? Sont-elles compl\u00e9mentaires ou ind\u00e9pendantes dans votre pratique ?"] },
+  C2: { label: "Cr\u00e9er des contenus et des solutions de communication",
+    classiques: ["Comment avez-vous organis\u00e9 votre travail pour mener \u00e0 bien ce projet dans les d\u00e9lais impartis ?","En quoi vos cr\u00e9ations \u00e9taient-elles adapt\u00e9es \u00e0 la cible, au m\u00e9dia et au support choisis ?","Quels choix r\u00e9dactionnels avez-vous effectu\u00e9s et comment les justifiez-vous ?","Quels choix iconographiques avez-vous effectu\u00e9s et pourquoi sont-ils pertinents pour ce projet ?","Avez-vous pris en compte les contraintes juridiques li\u00e9es \u00e0 l\u2019utilisation d\u2019images ou de textes ? Comment ?","Quels outils et logiciels professionnels avez-vous utilis\u00e9s pour cr\u00e9er ce projet ?","Comment avez-vous assur\u00e9 la coh\u00e9rence visuelle et r\u00e9dactionnelle de l\u2019ensemble de vos cr\u00e9ations ?","Y a-t-il eu des allers-retours avec le commanditaire sur vos cr\u00e9ations ? Comment les avez-vous g\u00e9r\u00e9s ?","Comment avez-vous respect\u00e9 la charte graphique ou l\u2019identit\u00e9 visuelle de l\u2019organisation ?","Quels enjeux d\u00e9ontologiques avez-vous pris en compte dans la conception de ce projet ?"],
+    exigeantes: ["Comment avez-vous prioris\u00e9 vos t\u00e2ches lorsque vous avez rencontr\u00e9 des impr\u00e9vus dans l\u2019organisation du projet ?","En quoi vos choix cr\u00e9atifs attestent-ils d\u2019une ma\u00eetrise r\u00e9elle des techniques, et non d\u2019une simple application de r\u00e8gles ?","Quel risque juridique avez-vous identifi\u00e9 sur ce projet, et comment l\u2019avez-vous anticip\u00e9 ou \u00e9cart\u00e9 ?","Si le commanditaire vous avait demand\u00e9 de modifier profond\u00e9ment votre cr\u00e9ation en derni\u00e8re minute, comment auriez-vous g\u00e9r\u00e9 cela ?","En quoi votre organisation de travail r\u00e9v\u00e8le-t-elle une posture professionnelle, et pas seulement une gestion scolaire du projet ?","Comment avez-vous articul\u00e9 contrainte de brief, contrainte de charte et libert\u00e9 cr\u00e9ative ? O\u00f9 \u00e9taient vos marges de manoeuvre ?","Quelle d\u00e9cision cr\u00e9ative avez-vous d\u00fb d\u00e9fendre face \u00e0 une objection du commanditaire ? Comment avez-vous argument\u00e9 ?","En quoi vos choix de format et de support r\u00e9v\u00e8lent-ils une compr\u00e9hension des usages de la cible, au-del\u00e0 des instructions du brief ?","Comment avez-vous g\u00e9r\u00e9 un d\u00e9saccord entre vos convictions cr\u00e9atives et les exigences d\u00e9ontologiques ou juridiques ?","Quelle comp\u00e9tence technique vous a manqu\u00e9 sur ce projet, et comment l\u2019avez-vous compens\u00e9e ?"] },
+  C3: { label: "Produire et diffuser des solutions de communication",
+    classiques: ["Quelles contraintes techniques avez-vous d\u00fb respecter pour produire et diffuser ce projet ?","Comment avez-vous respect\u00e9 les d\u00e9lais fix\u00e9s dans le cadre de ce projet ?","Avez-vous d\u00fb tenir compte d\u2019un budget ? Comment l\u2019avez-vous g\u00e9r\u00e9 ?","Quelles contraintes environnementales ou soci\u00e9tales avez-vous int\u00e9gr\u00e9es dans votre production ?","Comment avez-vous assur\u00e9 la rigueur technique dans la pr\u00e9paration des fichiers finaux ?","Avez-vous planifi\u00e9 et anim\u00e9 des contenus digitaux ? Selon quelle logique \u00e9ditoriale ?","Comment avez-vous pr\u00e9par\u00e9 les \u00e9l\u00e9ments destin\u00e9s \u00e0 l\u2019impression ou \u00e0 la diffusion en ligne ?","Quelles difficult\u00e9s techniques avez-vous rencontr\u00e9es et comment les avez-vous r\u00e9solues ?","Avez-vous respect\u00e9 le planning initial ? Si non, pour quelles raisons et avec quelles cons\u00e9quences ?","Comment avez-vous assur\u00e9 la coh\u00e9rence entre les diff\u00e9rentes d\u00e9clinaisons de votre production ?"],
+    exigeantes: ["Comment avez-vous arbitr\u00e9 entre exigences de qualit\u00e9 et contraintes de d\u00e9lai lorsque les deux \u00e9taient en tension ?","En quoi vos choix techniques de production refl\u00e8tent-ils une compr\u00e9hension des contraintes r\u00e9elles du m\u00e9tier ?","Quelle contrainte technique a le plus influenc\u00e9 vos choix cr\u00e9atifs ? En quoi \u00e9tait-ce un frein ou une opportunit\u00e9 ?","Comment avez-vous int\u00e9gr\u00e9 des consid\u00e9rations environnementales dans vos d\u00e9cisions de production, au-del\u00e0 du simple respect des consignes ?","Si vous aviez dispos\u00e9 de plus de temps, qu\u2019auriez-vous am\u00e9lior\u00e9 techniquement, et pourquoi ne l\u2019avez-vous pas fait dans les d\u00e9lais ?","Comment avez-vous planifi\u00e9 la diffusion de vos contenus digitaux en tenant compte des comportements de la cible ?","Quelle erreur technique avez-vous commise, et comment l\u2019avez-vous d\u00e9tect\u00e9e et corrig\u00e9e avant la livraison ?","En quoi votre gestion du budget r\u00e9v\u00e8le-t-elle une compr\u00e9hension des r\u00e9alit\u00e9s \u00e9conomiques d\u2019une production professionnelle ?","Comment avez-vous assur\u00e9 la p\u00e9rennit\u00e9 et la maintenabilit\u00e9 de vos productions digitales apr\u00e8s la livraison ?","Quelle d\u00e9cision de production avez-vous regrett\u00e9e une fois le projet livr\u00e9, et que feriez-vous diff\u00e9remment ?"] },
+  C4: { label: "Acheter des prestations",
+    classiques: ["Avez-vous fait appel \u00e0 des prestataires externes sur ce projet ? Lesquels et pourquoi ?","Comment avez-vous formalis\u00e9 votre demande aupr\u00e8s d\u2019un prestataire ?","Sur quels crit\u00e8res avez-vous s\u00e9lectionn\u00e9 vos prestataires ?","Avez-vous compar\u00e9 plusieurs devis ou propositions ? Comment avez-vous tranch\u00e9 ?","Comment avez-vous suivi l\u2019avancement du travail du prestataire et v\u00e9rifi\u00e9 sa conformit\u00e9 \u00e0 la demande ?","Avez-vous rencontr\u00e9 des difficult\u00e9s avec un prestataire ? Comment les avez-vous g\u00e9r\u00e9es ?","Quels documents avez-vous produits pour encadrer la relation avec le prestataire ?","Comment avez-vous respect\u00e9 les \u00e9tapes d\u2019un achat professionnel sur ce projet ?","Comment avez-vous v\u00e9rifi\u00e9 que le livrable du prestataire correspondait \u00e0 votre demande initiale ?","Qu\u2019auriez-vous fait si le prestataire n\u2019avait pas respect\u00e9 le d\u00e9lai ou le budget convenu ?"],
+    exigeantes: ["En quoi votre cahier des charges traduit-il une compr\u00e9hension pr\u00e9cise des enjeux techniques et cr\u00e9atifs du projet ?","Comment avez-vous \u00e9valu\u00e9 la fiabilit\u00e9 d\u2019un prestataire au-del\u00e0 du simple crit\u00e8re du prix ?","Quelle erreur dans la gestion d\u2019un achat prestataire vous a co\u00fbt\u00e9 du temps ou de la qualit\u00e9 ? Qu\u2019en avez-vous appris ?","Comment avez-vous n\u00e9goci\u00e9 avec un prestataire lorsque sa proposition ne correspondait pas \u00e0 vos attentes ou votre budget ?","En quoi la formalisation de votre demande a-t-elle prot\u00e9g\u00e9 le projet d\u2019\u00e9ventuels malentendus ou d\u00e9rives ?","Comment avez-vous int\u00e9gr\u00e9 les contraintes juridiques et contractuelles dans votre relation avec les prestataires ?","Quelle d\u00e9cision d\u2019achat avez-vous prise de mani\u00e8re autonome, et sur quels crit\u00e8res vous \u00eates-vous appuy\u00e9 ?","Comment avez-vous arbitr\u00e9 entre faire en interne et sous-traiter ? Quels crit\u00e8res ont guid\u00e9 ce choix ?","En quoi votre processus d\u2019achat se distingue-t-il d\u2019une simple commande ? Qu\u2019est-ce qui en fait une d\u00e9marche professionnelle ?","Quel prestataire auriez-vous choisi diff\u00e9remment avec le recul, et pourquoi ?"] },
+  C5: { label: "Contr\u00f4ler et \u00e9valuer les solutions de communication",
+    classiques: ["Comment avez-vous \u00e9valu\u00e9 les r\u00e9sultats de votre production de communication ?","Quels indicateurs ou crit\u00e8res avez-vous utilis\u00e9s pour mesurer l\u2019efficacit\u00e9 de votre projet ?","Les r\u00e9sultats obtenus correspondaient-ils aux objectifs fix\u00e9s ? Pourquoi ?","Quels outils d\u2019\u00e9valuation avez-vous mis en oeuvre \u2014 statistiques, sondages, retours commanditaire ?","Avez-vous r\u00e9alis\u00e9 des ajustements en cours de projet suite \u00e0 une \u00e9valuation interm\u00e9diaire ?","Comment avez-vous pr\u00e9sent\u00e9 les r\u00e9sultats de l\u2019\u00e9valuation au commanditaire ?","Qu\u2019est-ce que l\u2019\u00e9valuation de ce projet vous a appris sur votre pratique ?","Y a-t-il eu des r\u00e9sultats inattendus, positifs ou n\u00e9gatifs ? Comment les expliquez-vous ?","Si les r\u00e9sultats avaient \u00e9t\u00e9 insuffisants, quels ajustements auriez-vous propos\u00e9s ?","Comment avez-vous document\u00e9 l\u2019\u00e9valuation pour en garder une trace exploitable ?"],
+    exigeantes: ["En quoi vos indicateurs d\u2019\u00e9valuation \u00e9taient-ils align\u00e9s sur les objectifs de communication, et pas seulement sur des m\u00e9triques faciles \u00e0 mesurer ?","Comment distinguez-vous un r\u00e9sultat satisfaisant d\u2019un r\u00e9sultat r\u00e9ellement efficace pour le commanditaire ? Donnez un exemple concret.","Quelle limite avez-vous identifi\u00e9e dans vos outils d\u2019\u00e9valuation, et comment auriez-vous pu la compenser ?","Si les r\u00e9sultats avaient \u00e9t\u00e9 tr\u00e8s en dessous des attentes, comment auriez-vous analys\u00e9 les causes et structur\u00e9 votre plan d\u2019ajustement ?","En quoi l\u2019\u00e9valuation de ce projet a-t-elle modifi\u00e9 votre mani\u00e8re d\u2019aborder la conception d\u2019un projet suivant ?","Comment avez-vous diff\u00e9renci\u00e9 ce qui relevait d\u2019une erreur de conception d\u2019une contrainte externe dans l\u2019analyse de vos r\u00e9sultats ?","En quoi votre analyse des r\u00e9sultats d\u00e9montre-t-elle une posture critique sur votre propre travail, au-del\u00e0 d\u2019une simple lecture des chiffres ?","Comment avez-vous utilis\u00e9 les enseignements de l\u2019\u00e9valuation pour am\u00e9liorer concr\u00e8tement un projet ult\u00e9rieur ?","Quels ajustements auriez-vous propos\u00e9s si vous aviez dispos\u00e9 d\u2019un budget suppl\u00e9mentaire suite \u00e0 l\u2019\u00e9valuation ?","Comment pr\u00e9senteriez-vous des r\u00e9sultats d\u00e9cevants \u00e0 un commanditaire tout en maintenant sa confiance et en proposant une perspective constructive ?"] }
+};
 
-${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 questions approfondies.` : `Explore les 5 critères C1 à C5.`}
-${sévère ? `MODE SÉVÈRE : Relance sur chaque réponse vague. "Soyez plus précis.", "Donnez un exemple concret.", "Qu'est-ce qui vous permet de dire ça ?"` : ""}
+const makeSystemP1 = (cibl\u00e9=null, s\u00e9v\u00e8re=false, isSimulation=false) => {
+  const niveau = s\u00e9v\u00e8re ? "exigeantes" : "classiques";
+  const bank = cibl\u00e9
+    ? Object.entries(QUESTIONS_P1).filter(([k,v]) => v.label.toLowerCase().includes(cibl\u00e9.toLowerCase().slice(0,12)))
+    : Object.entries(QUESTIONS_P1);
+  const bankStr = bank.map(([k,v]) => "=== " + k + " : " + v.label + " ===\n" + v[niveau].map((q,i) => (i+1)+". "+q).join("\n")).join("\n\n");
+  return "Tu es un jury de BTS Communication \u2014 Partie 1 : Parcours de professionnalisation (15 min).\n\nR\u00c8GLE FONDAMENTALE : Tu poses EXCLUSIVEMENT les questions list\u00e9es ci-dessous, mot pour mot. Ces questions couvrent UNIQUEMENT la Partie 1. La Partie 2 (veille, prestataires, production, diffusion, \u00e9valuation) n\u2019existe pas pour toi dans cette session.\n\nBANQUE DE QUESTIONS AUTORIS\u00c9ES \u2014 PARTIE 1 UNIQUEMENT :\n" + bankStr + "\n\nR\u00c8GLES :\n- Pose ces questions MOT POUR MOT telles qu\u2019elles sont \u00e9crites.\n- Une seule question \u00e0 la fois.\n- Si annexe mentionn\u00e9e : \"Pouvez-vous me pr\u00e9senter cette annexe ?\"\n- Relance possible : \"Soyez plus pr\u00e9cis.\" ou \"Donnez un exemple concret.\"\n- INTERDIT : actions narratives, conseils, encouragements.\n- Feedback UNIQUEMENT sur \"BILAN\".\n" + (s\u00e9v\u00e8re ? "MODE S\u00c9V\u00c8RE : Relance syst\u00e9matiquement sur chaque r\u00e9ponse vague.\n" : "") + "\nCommence directement par la premi\u00e8re question d\u2019un crit\u00e8re choisi au hasard.\n\nSur \"BILAN\" :\n" + (isSimulation ? "MODE SIMULATION \u2014 Note officielle /10 :\nUtilise la grille officielle : Tr\u00e8s insuffisant / Insuffisant / Satisfaisant / Tr\u00e8s satisfaisant pour chaque crit\u00e8re C1 \u00e0 C5.\nBAR\u00c8ME PLAFOND OBLIGATOIRE :\n- Sans annexes ET r\u00e9ponses vagues \u2192 note entre 0 et 3/10\n- Peu d\u2019annexes ET r\u00e9ponses bancales \u2192 note entre 3 et 6/10\n- Annexes d\u00e9crites ET r\u00e9ponses professionnelles \u2192 note entre 6 et 10/10\nFormat STRICT :\nNOTE_P1: X/10\nC1: [niveau] | [justification]\nC2: [niveau] | [justification]\nC3: [niveau] | [justification]\nC4: [niveau] | [justification]\nC5: [niveau] | [justification]\nEXPRESSION_ORALE: [niveau] | [commentaire]\nPALIER: [0-3 / 3-6 / 6-10] | [raison]\nPOINTS_FORTS: [liste]\nPOINTS_FAIBLES: [liste]\nRECOMMANDATIONS: [liste]" : "MODE ENTRA\u00ceNEMENT \u2014 Pas de note chiffr\u00e9e.\nFormat STRICT :\nAPPRECIATION_GLOBALE: [niveau]\nC1_NIVEAU: [niveau]\nC1_BIEN: [ce qui \u00e9tait bien]\nC1_MANQUE: [ce qui manquait]\nC1_EXEMPLE: [exemple id\u00e9al]\nC2_NIVEAU: [niveau]\nC2_BIEN: [ce qui \u00e9tait bien]\nC2_MANQUE: [ce qui manquait]\nC2_EXEMPLE: [exemple id\u00e9al]\nC3_NIVEAU: [niveau]\nC3_BIEN: [ce qui \u00e9tait bien]\nC3_MANQUE: [ce qui manquait]\nC3_EXEMPLE: [exemple id\u00e9al]\nC4_NIVEAU: [niveau]\nC4_BIEN: [ce qui \u00e9tait bien]\nC4_MANQUE: [ce qui manquait]\nC4_EXEMPLE: [exemple id\u00e9al]\nC5_NIVEAU: [niveau]\nC5_BIEN: [ce qui \u00e9tait bien]\nC5_MANQUE: [ce qui manquait]\nC5_EXEMPLE: [exemple id\u00e9al]\nEXPRESSION_ORALE: [niveau] | [commentaire]\nRECOMMANDATIONS: [axes prioritaires s\u00e9par\u00e9s par des points-virgules]");
+};
 
-Commence directement par ta première question, sans introduction.
-IMPORTANT : commence par un critère choisi aléatoirement parmi C1 à C5 — ne commence JAMAIS par C1 systématiquement. Varie l'ordre à chaque session.
-
-Sur "BILAN" :
-${isSimulation ? `MODE SIMULATION — Note officielle /10 :
-Utilise la grille officielle : Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant pour chaque critère C1 à C5.
-BARÈME PLAFOND OBLIGATOIRE — applique-le strictement :
-- Candidat sans annexes ET réponses vagues/très courtes → note entre 0 et 3/10
-- Candidat avec peu ou pas d'annexes ET réponses bancales → note entre 3 et 6/10
-- Candidat avec annexes décrites ET réponses professionnelles et détaillées → note entre 6 et 10/10
-Indique clairement le palier appliqué et pourquoi.
-Format de réponse STRICT (pour parsing automatique) :
-NOTE_P1: X/10
-C1: [niveau] | [justification courte]
-C2: [niveau] | [justification courte]
-C3: [niveau] | [justification courte]
-C4: [niveau] | [justification courte]
-C5: [niveau] | [justification courte]
-EXPRESSION_ORALE: [niveau] | [commentaire]
-PALIER: [0-3 / 3-6 / 6-10] | [raison]
-POINTS_FORTS: [liste]
-POINTS_FAIBLES: [liste]
-RECOMMANDATIONS: [liste]` : `MODE ENTRAÎNEMENT — Rôle pédagogique, pas de note chiffrée.
-Pour chaque critère évalué durant la session, rédige une fiche pédagogique complète.
-Format STRICT — utilise exactement ces balises :
-
-APPRECIATION_GLOBALE: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
-
-C1_NIVEAU: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
-C1_BIEN: [ce que le candidat a bien dit — cite ses propres mots si possible]
-C1_MANQUE: [ce qui manquait concrètement — sois précis et factuel]
-C1_EXEMPLE: [formule un exemple concret de ce qu'il aurait fallu dire]
-
-C2_NIVEAU: [niveau]
-C2_BIEN: [points positifs]
-C2_MANQUE: [manques concrets]
-C2_EXEMPLE: [exemple de bonne réponse]
-
-C3_NIVEAU: [niveau]
-C3_BIEN: [points positifs]
-C3_MANQUE: [manques concrets]
-C3_EXEMPLE: [exemple de bonne réponse]
-
-C4_NIVEAU: [niveau]
-C4_BIEN: [points positifs]
-C4_MANQUE: [manques concrets]
-C4_EXEMPLE: [exemple de bonne réponse]
-
-C5_NIVEAU: [niveau]
-C5_BIEN: [points positifs]
-C5_MANQUE: [manques concrets]
-C5_EXEMPLE: [exemple de bonne réponse]
-
-EXPRESSION_ORALE: [niveau] | [commentaire sur syntaxe, niveau de langue, clarté]
-RECOMMANDATIONS: [3-5 axes prioritaires d'amélioration séparés par des points-virgules]`}`;
-
-const makeSystemP2 = (ciblé=null, sévère=false, isSimulation=false) => `Tu es un jury de BTS Communication — Partie 2 : Dossier projets (20 min).
-Grille officielle BTS Com E6 Bloc 2 — Partie 2 (note /10) :
-- C1 : Mettre en œuvre une veille créative et technologique
-- C2 : Créer des contenus et des solutions de communication
-- C3 : Produire et diffuser des solutions de communication
-- C4 : Acheter des prestations
-- C5 : Contrôler et évaluer les solutions de communication
-
-RÈGLES ABSOLUES :
-- Tu poses UNIQUEMENT des questions. Une seule à la fois. Courte. Directe.
-- INTERDIT : *je note*, *je me penche*, ou toute action narrative.
-- INTERDIT : conseils ou encouragements pendant la session.
-- Demande systématiquement les annexes : "Avez-vous une annexe sur ce point ? Décrivez-la moi."
-- Feedback et conseils UNIQUEMENT sur "BILAN".
-
-${ciblé ? `MODE CIBLÉ : concentre-toi UNIQUEMENT sur "${ciblé}". Pose 4-5 questions approfondies.` : `Explore les 5 compétences C1 à C5.`}
-${sévère ? `MODE SÉVÈRE : Relance sur chaque réponse vague. Demande des preuves, des chiffres, des documents.` : ""}
-
-Commence directement par ta première question, sans introduction.
-IMPORTANT : commence par un critère choisi aléatoirement parmi C1 à C5 — ne commence JAMAIS par C1 systématiquement. Varie l'ordre à chaque session.
-
-Sur "BILAN" :
-${isSimulation ? `MODE SIMULATION — Note officielle /10 :
-Utilise la grille officielle : Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant pour chaque critère C1 à C5.
-BARÈME PLAFOND OBLIGATOIRE — applique-le strictement :
-- Candidat sans annexes ET réponses vagues/très courtes → note entre 0 et 3/10
-- Candidat avec peu ou pas d'annexes ET réponses bancales → note entre 3 et 6/10
-- Candidat avec annexes décrites ET réponses professionnelles et détaillées → note entre 6 et 10/10
-Indique clairement le palier appliqué et pourquoi.
-Format de réponse STRICT (pour parsing automatique) :
-NOTE_P2: X/10
-C1: [niveau] | [justification courte]
-C2: [niveau] | [justification courte]
-C3: [niveau] | [justification courte]
-C4: [niveau] | [justification courte]
-C5: [niveau] | [justification courte]
-EXPRESSION_ORALE: [niveau] | [commentaire]
-PALIER: [0-3 / 3-6 / 6-10] | [raison]
-POINTS_FORTS: [liste]
-POINTS_FAIBLES: [liste]
-RECOMMANDATIONS: [liste]` : `MODE ENTRAÎNEMENT — Rôle pédagogique, pas de note chiffrée.
-Pour chaque critère évalué durant la session, rédige une fiche pédagogique complète.
-Format STRICT — utilise exactement ces balises :
-
-APPRECIATION_GLOBALE: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
-
-C1_NIVEAU: [Très insuffisant / Insuffisant / Satisfaisant / Très satisfaisant]
-C1_BIEN: [ce que le candidat a bien dit — cite ses propres mots si possible]
-C1_MANQUE: [ce qui manquait concrètement — sois précis et factuel]
-C1_EXEMPLE: [formule un exemple concret de ce qu'il aurait fallu dire]
-
-C2_NIVEAU: [niveau]
-C2_BIEN: [points positifs]
-C2_MANQUE: [manques concrets]
-C2_EXEMPLE: [exemple de bonne réponse]
-
-C3_NIVEAU: [niveau]
-C3_BIEN: [points positifs]
-C3_MANQUE: [manques concrets]
-C3_EXEMPLE: [exemple de bonne réponse]
-
-C4_NIVEAU: [niveau]
-C4_BIEN: [points positifs]
-C4_MANQUE: [manques concrets]
-C4_EXEMPLE: [exemple de bonne réponse]
-
-C5_NIVEAU: [niveau]
-C5_BIEN: [points positifs]
-C5_MANQUE: [manques concrets]
-C5_EXEMPLE: [exemple de bonne réponse]
-
-EXPRESSION_ORALE: [niveau] | [commentaire sur syntaxe, niveau de langue, clarté]
-RECOMMANDATIONS: [3-5 axes prioritaires d'amélioration séparés par des points-virgules]`}`;
+const makeSystemP2 = (cibl\u00e9=null, s\u00e9v\u00e8re=false, isSimulation=false) => {
+  const niveau = s\u00e9v\u00e8re ? "exigeantes" : "classiques";
+  const bank = cibl\u00e9
+    ? Object.entries(QUESTIONS_P2).filter(([k,v]) => v.label.toLowerCase().includes(cibl\u00e9.toLowerCase().slice(0,12)))
+    : Object.entries(QUESTIONS_P2);
+  const bankStr = bank.map(([k,v]) => "=== " + k + " : " + v.label + " ===\n" + v[niveau].map((q,i) => (i+1)+". "+q).join("\n")).join("\n\n");
+  return "Tu es un jury de BTS Communication \u2014 Partie 2 : Dossier projets (20 min).\n\nR\u00c8GLE FONDAMENTALE : Tu poses EXCLUSIVEMENT les questions list\u00e9es ci-dessous, mot pour mot. Ces questions couvrent UNIQUEMENT la Partie 2. La Partie 1 (productions du portfolio, choix cr\u00e9atifs, parcours personnel) n\u2019existe pas pour toi dans cette session.\n\nBANQUE DE QUESTIONS AUTORIS\u00c9ES \u2014 PARTIE 2 UNIQUEMENT :\n" + bankStr + "\n\nR\u00c8GLES :\n- Pose ces questions MOT POUR MOT telles qu\u2019elles sont \u00e9crites.\n- Une seule question \u00e0 la fois.\n- Si annexe mentionn\u00e9e : \"Pouvez-vous me pr\u00e9senter cette annexe ?\"\n- Relance possible : \"Soyez plus pr\u00e9cis.\" ou \"Donnez un exemple concret.\"\n- INTERDIT : actions narratives, conseils, encouragements.\n- Feedback UNIQUEMENT sur \"BILAN\".\n" + (s\u00e9v\u00e8re ? "MODE S\u00c9V\u00c8RE : Relance syst\u00e9matiquement sur chaque r\u00e9ponse vague.\n" : "") + "\nCommence directement par la premi\u00e8re question d\u2019une comp\u00e9tence choisie au hasard.\n\nSur \"BILAN\" :\n" + (isSimulation ? "MODE SIMULATION \u2014 Note officielle /10 :\nUtilise la grille officielle : Tr\u00e8s insuffisant / Insuffisant / Satisfaisant / Tr\u00e8s satisfaisant pour chaque comp\u00e9tence C1 \u00e0 C5.\nBAR\u00c8ME PLAFOND OBLIGATOIRE :\n- Sans annexes ET r\u00e9ponses vagues \u2192 note entre 0 et 3/10\n- Peu d\u2019annexes ET r\u00e9ponses bancales \u2192 note entre 3 et 6/10\n- Annexes d\u00e9crites ET r\u00e9ponses professionnelles \u2192 note entre 6 et 10/10\nFormat STRICT :\nNOTE_P2: X/10\nC1: [niveau] | [justification]\nC2: [niveau] | [justification]\nC3: [niveau] | [justification]\nC4: [niveau] | [justification]\nC5: [niveau] | [justification]\nEXPRESSION_ORALE: [niveau] | [commentaire]\nPALIER: [0-3 / 3-6 / 6-10] | [raison]\nPOINTS_FORTS: [liste]\nPOINTS_FAIBLES: [liste]\nRECOMMANDATIONS: [liste]" : "MODE ENTRA\u00ceNEMENT \u2014 Pas de note chiffr\u00e9e.\nFormat STRICT :\nAPPRECIATION_GLOBALE: [niveau]\nC1_NIVEAU: [niveau]\nC1_BIEN: [ce qui \u00e9tait bien]\nC1_MANQUE: [ce qui manquait]\nC1_EXEMPLE: [exemple id\u00e9al]\nC2_NIVEAU: [niveau]\nC2_BIEN: [ce qui \u00e9tait bien]\nC2_MANQUE: [ce qui manquait]\nC2_EXEMPLE: [exemple id\u00e9al]\nC3_NIVEAU: [niveau]\nC3_BIEN: [ce qui \u00e9tait bien]\nC3_MANQUE: [ce qui manquait]\nC3_EXEMPLE: [exemple id\u00e9al]\nC4_NIVEAU: [niveau]\nC4_BIEN: [ce qui \u00e9tait bien]\nC4_MANQUE: [ce qui manquait]\nC4_EXEMPLE: [exemple id\u00e9al]\nC5_NIVEAU: [niveau]\nC5_BIEN: [ce qui \u00e9tait bien]\nC5_MANQUE: [ce qui manquait]\nC5_EXEMPLE: [exemple id\u00e9al]\nEXPRESSION_ORALE: [niveau] | [commentaire]\nRECOMMANDATIONS: [axes prioritaires s\u00e9par\u00e9s par des points-virgules]");
+};
 
 const PHASES = [
   { id:"p0", label:"Présentation personnelle", duration:5*60, icon:"🎤", intro:"Chrono lancé. Présente-toi pendant 5 minutes sans interruption, puis appuie sur Terminer." },
@@ -820,7 +726,10 @@ export default function App() {
     setParsedBilan(null); setShowExitConfirm(false);
     if (p.id !== "p0") {
       const sys = getSystem(p, cib);
-      const first = await callAI([{ role: "user", content: "Commence l'entretien. Varie l'ordre des critères — ne commence pas toujours par C1, choisis un point d'entrée différent à chaque session." }], sys);
+      const startMsg = p.id === "p1"
+        ? "Commence l'entretien. Tu es en PARTIE 1 — Parcours de professionnalisation. Pose UNIQUEMENT des questions sur les 5 critères de la Partie 1 : C1 Productions réalisées, C2 Contextes et enjeux, C3 Choix créatifs, C4 Parcours de professionnalisation, C5 Regard réflexif. INTERDIT de poser des questions sur la veille, les prestataires, la diffusion ou l'évaluation (ces thèmes appartiennent à la Partie 2). Commence par un critère au hasard parmi les 5 de la Partie 1."
+        : "Commence l'entretien. Tu es en PARTIE 2 — Dossier projets. Pose UNIQUEMENT des questions sur les 5 compétences de la Partie 2 : C1 Veille créative et technologique, C2 Création de contenus, C3 Production et diffusion, C4 Achat de prestations, C5 Contrôle et évaluation. INTERDIT de poser des questions sur les productions du portfolio, les choix créatifs ou le parcours personnel (ces thèmes appartiennent à la Partie 1). Commence par une compétence au hasard parmi les 5 de la Partie 2.";
+      const first = await callAI([{ role: "user", content: startMsg }], sys);
       setMessages([{ role: "assistant", content: first }]);
       speak(first);
     }
@@ -1112,14 +1021,10 @@ export default function App() {
         }
         /* ── DESKTOP (≥1024px) ── */
         @media (min-width: 1024px) {
-          /* Scale uniquement sur home et feedback — pas sur session */
           .page-container {
             max-width: 100%;
             padding: 0;
-            transform-origin: top center;
-            transform: scale(1.45);
-            width: calc(100% / 1.45);
-            margin-left: calc((100% - 100% / 1.45) / 2);
+            zoom: 1.45;
           }
           .session-container {
             zoom: 1.45;
