@@ -816,8 +816,8 @@ export default function App() {
       const first = await callAI([{ role: "user", content: "Commence l'entretien. Varie l'ordre des critères — ne commence pas toujours par C1, choisis un point d'entrée différent à chaque session." }], sys);
       setMessages([{ role: "assistant", content: first }]);
       speak(first);
-      setRunning(true);
-    } else setRunning(true);
+    }
+    setRunning(true);
   };
 
   const startFull = () => startPhase(0, "full");
@@ -1398,46 +1398,83 @@ export default function App() {
 
           {/* Contrôles */}
           <div className="controls-area" style={{ borderTop: `1px solid ${C.border}`, background: C.bg, flexShrink: 0 }}>
-            {!showTextInput ? (
+            {phase.id === "p0" ? (
+              /* ── Contrôles P0 : micro simple + bouton valider ── */
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+                {/* Transcript en cours */}
+                {transcript && (
+                  <div style={{ width: "100%", background: C.purpleLight, borderRadius: 12, padding: "10px 14px", fontSize: 13, color: C.purpleDark, lineHeight: 1.6, maxHeight: 80, overflowY: "auto" }}>{transcript}</div>
+                )}
+                {/* Résumé du monologue accumulé */}
+                {monoRef.current && !transcript && (
+                  <div style={{ width: "100%", background: C.bg2, borderRadius: 10, padding: "8px 12px", fontSize: 12, color: C.textSub }}>
+                    {monoRef.current.split(" ").length} mots enregistrés
+                  </div>
+                )}
+                {/* Bouton micro */}
+                <div style={{ display: "flex", gap: 14, alignItems: "center", justifyContent: "center" }}>
+                  {!recording ? (
+                    <button onClick={startRecording} disabled={loading} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.purple}`, background: C.purpleLight, cursor: loading ? "not-allowed" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, opacity: loading ? 0.5 : 1 }}>
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={C.purple} strokeWidth="2" strokeLinecap="round"><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10a7 7 0 0014 0" /><line x1="12" y1="19" x2="12" y2="22" /><line x1="8" y1="22" x2="16" y2="22" /></svg>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: C.purple }}>PARLER</span>
+                    </button>
+                  ) : (
+                    <button onClick={stopAndSend} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.pink}`, background: C.pinkLight, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, animation: "pulse 1.2s infinite" }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill={C.pink}><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: C.pink }}>PAUSE</span>
+                    </button>
+                  )}
+                </div>
+                {/* Bouton valider — toujours visible */}
+                <button
+                  onClick={endPhase}
+                  disabled={loading}
+                  className="btn-primary"
+                  style={{ width: "100%", padding: "15px", fontSize: 15, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, opacity: loading ? 0.7 : 1 }}
+                >
+                  {loading
+                    ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Analyse en cours…</>
+                    : "✅ Valider ma présentation"
+                  }
+                </button>
+                <button onClick={() => setShowTextInput(v => !v)} style={{ background: "none", border: "none", fontSize: 13, color: C.textSub, cursor: "pointer", textDecoration: "underline" }}>
+                  {showTextInput ? "🎤 Micro" : "✏️ Dicter par écrit"}
+                </button>
+                {showTextInput && (
+                  <div style={{ width: "100%", display: "flex", gap: 8 }}>
+                    <textarea value={textInput} onChange={e => setTextInput(e.target.value)} placeholder="Écris ta présentation ici…" rows={3} style={{ flex: 1, padding: "10px 14px", borderRadius: 12, border: `1.5px solid ${C.border}`, fontSize: 13, resize: "none", fontFamily: "inherit" }} />
+                    <button onClick={() => { if (textInput.trim()) { monoRef.current += " " + textInput.trim(); setTextInput(""); } }} disabled={!textInput.trim()} style={{ padding: "10px 14px", borderRadius: 12, border: "none", background: textInput.trim() ? C.grad : C.bg2, color: textInput.trim() ? "#fff" : C.textSub, fontWeight: 600, cursor: "pointer", alignSelf: "flex-end" }}>+</button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* ── Contrôles P1/P2 ── */
+              !showTextInput ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                 {transcript && (
                   <div style={{ width: "100%", background: C.purpleLight, borderRadius: 12, padding: "10px 14px", fontSize: 13, color: C.purpleDark, lineHeight: 1.6, maxHeight: 100, overflowY: "auto" }}>{transcript}</div>
                 )}
                 <div style={{ display: "flex", gap: 14, alignItems: "center", justifyContent: "center", width: "100%" }}>
                   {!recording ? (
-                    <>
-                      <button onClick={startRecording} disabled={loading} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.purple}`, background: C.purpleLight, cursor: loading ? "not-allowed" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, opacity: loading ? 0.5 : 1, flexShrink: 0 }}>
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={C.purple} strokeWidth="2" strokeLinecap="round"><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10a7 7 0 0014 0" /><line x1="12" y1="19" x2="12" y2="22" /><line x1="8" y1="22" x2="16" y2="22" /></svg>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: C.purple }}>PARLER</span>
-                      </button>
-                      {phase.id === "p0" && (
-                        <button onClick={endPhase} disabled={loading} className="btn-primary" style={{ padding: "14px 22px", fontSize: 14, opacity: loading ? 0.5 : 1, display: "flex", alignItems: "center", gap: 8 }}>
-                          {loading ? <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Analyse…</> : "Terminer →"}
-                        </button>
-                      )}
-                    </>
+                    <button onClick={startRecording} disabled={loading} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.purple}`, background: C.purpleLight, cursor: loading ? "not-allowed" : "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, opacity: loading ? 0.5 : 1, flexShrink: 0 }}>
+                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={C.purple} strokeWidth="2" strokeLinecap="round"><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M5 10a7 7 0 0014 0" /><line x1="12" y1="19" x2="12" y2="22" /><line x1="8" y1="22" x2="16" y2="22" /></svg>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: C.purple }}>PARLER</span>
+                    </button>
                   ) : (
-                    <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-                      <button onClick={stopAndSend} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.pink}`, background: C.pinkLight, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, animation: "pulse 1.2s infinite", flexShrink: 0 }}>
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill={C.pink}><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
-                        <span style={{ fontSize: 9, fontWeight: 700, color: C.pink }}>PAUSE</span>
-                      </button>
-                      {phase.id === "p0" && (
-                        <button onClick={endPhase} disabled={loading} className="btn-primary" style={{ padding: "14px 22px", fontSize: 14, opacity: loading ? 0.5 : 1, display: "flex", alignItems: "center", gap: 8 }}>
-                          {loading ? <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,0.4)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} /> Analyse…</> : "Terminer →"}
-                        </button>
-                      )}
-                    </div>
+                    <button onClick={stopAndSend} className="mic-btn" style={{ borderRadius: "50%", border: `3px solid ${C.pink}`, background: C.pinkLight, cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3, animation: "pulse 1.2s infinite", flexShrink: 0 }}>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill={C.pink}><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+                      <span style={{ fontSize: 9, fontWeight: 700, color: C.pink }}>ENVOYER</span>
+                    </button>
                   )}
                 </div>
                 <div style={{ display: "flex", gap: 20 }}>
                   <button onClick={() => setShowTextInput(true)} style={{ background: "none", border: "none", fontSize: 13, color: C.textSub, cursor: "pointer", textDecoration: "underline" }}>✏️ Écrire</button>
-                  {phase.id !== "p0" && !loading && messages.length > 2 && (
+                  {!loading && messages.length > 2 && (
                     <button onClick={endPhase} style={{ background: "none", border: "none", fontSize: 13, color: C.purple, cursor: "pointer", textDecoration: "underline" }}>📊 Voir le bilan</button>
                   )}
                 </div>
               </div>
-            ) : (
+              ) : (
               <div>
                 <div style={{ display: "flex", gap: 8 }}>
                   <textarea value={textInput} onChange={e => setTextInput(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendText(); } }} placeholder="Tapez votre réponse…" rows={3} style={{ flex: 1, padding: "10px 14px", borderRadius: 12, border: `1.5px solid ${C.border}`, background: C.bg, color: C.text, fontSize: 14, resize: "none", fontFamily: "inherit" }} />
@@ -1445,11 +1482,12 @@ export default function App() {
                 </div>
                 <div style={{ display: "flex", gap: 20, marginTop: 10 }}>
                   {speechSupported && <button onClick={() => setShowTextInput(false)} style={{ background: "none", border: "none", fontSize: 13, color: C.textSub, cursor: "pointer", textDecoration: "underline" }}>🎤 Micro</button>}
-                  {phase.id !== "p0" && !loading && messages.length > 2 && (
+                  {!loading && messages.length > 2 && (
                     <button onClick={endPhase} style={{ background: "none", border: "none", fontSize: 13, color: C.purple, cursor: "pointer", textDecoration: "underline" }}>📊 Voir le bilan</button>
                   )}
                 </div>
               </div>
+              )
             )}
           </div>
         </div>
