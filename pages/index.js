@@ -884,12 +884,21 @@ export default function App() {
     setShowEmailInput(false); setEmailInput(""); setEmailSent(false); setOpenSession(null);
   };
 
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement("script");
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+
   const generatePDF = async () => {
     if (!bilanRef.current) return;
     setPdfLoading(true);
     try {
-      const { default: html2canvas } = await import("html2canvas");
-      const { jsPDF } = await import("jspdf");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+      const html2canvas = window.html2canvas;
+      const { jsPDF } = window.jspdf;
       const element = bilanRef.current;
       const canvas = await html2canvas(element, {
         scale: 2,
